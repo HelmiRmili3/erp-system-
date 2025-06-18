@@ -1,0 +1,121 @@
+﻿# For more info on HTTP files go to https://aka.ms/vs/httpfile
+@Web_HostAddress = http://51.195.116.184:8080
+
+@Email=administrator@localhost
+@Password=Administrator1!
+@BearerToken=<YourToken>
+
+# POST Users Register
+POST {{Web_HostAddress}}/api/Users/Register
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+
+# @name login
+POST {{Web_HostAddress}}/api/Users/Login
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+@BearerToken = {{login.response.body.tokenType}} {{login.response.body.accessToken}}
+
+###
+
+# POST Users Refresh
+POST {{Web_HostAddress}}/api/Users/Refresh
+Authorization: {{BearerToken}}
+Content-Type: application/json
+
+{
+  "refreshToken": ""
+}
+
+###
+
+# GET WeatherForecast
+GET {{Web_HostAddress}}/api/WeatherForecasts
+Authorization: {{BearerToken}}
+
+
+### Categories Management
+
+# @name GetCategories
+GET {{Web_HostAddress}}/api/Categories
+Authorization: {{BearerToken}}
+
+###
+
+# The create category send a FormData containing a file, name, and parentCategoryId
+# @name CreateCategory
+POST {{Web_HostAddress}}/api/Categories
+Authorization: {{BearerToken}}
+Content-Type: multipart/form-data; boundary=SpecialBoundary
+
+--SpecialBoundary
+Content-Disposition: form-data; name="name"
+
+John
+--SpecialBoundary
+Content-Disposition: form-data; name="parentCategoryId"
+
+1
+--SpecialBoundary
+Content-Disposition: form-data; name="file"; filename="image.png"
+Content-Type: image/png
+
+< ./1.png
+
+--SpecialBoundary--
+
+###
+
+# @name UpdateCategory
+POST {{Web_HostAddress}}/api/Categories/10
+Authorization: {{BearerToken}}
+Content-Type: multipart/form-data; boundary=SpecialBoundary
+
+--SpecialBoundary
+Content-Disposition: form-data; name="id"
+
+10
+--SpecialBoundary
+Content-Disposition: form-data; name="name"
+
+John
+# --SpecialBoundary
+# Content-Disposition: form-data; name="parentCategoryId"
+
+# Null
+--SpecialBoundary
+Content-Disposition: form-data; name="file"; filename="image.png"
+Content-Type: image/png
+
+< ./pizza.png
+
+--SpecialBoundary--
+
+
+###
+
+# @name DeleteCategory
+DELETE {{Web_HostAddress}}/api/Categories/10
+Authorization: {{BearerToken}}
+
+###
+
+# @name GetCategory
+GET {{Web_HostAddress}}/api/Categories/4
+Authorization: {{BearerToken}}
+
+###
+
+

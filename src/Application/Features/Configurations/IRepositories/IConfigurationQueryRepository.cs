@@ -1,0 +1,8 @@
+﻿using Backend.Application.Common.Interfaces;
+using Backend.Domain.Entities;
+
+namespace Backend.Application.Features.Configurations.IRepositories;
+
+public interface IConfigurationQueryRepository : IQueryRepository<Configuration>
+{
+}

@@ -1,0 +1,71 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+@Web_HostAddress = https://localhost:5001
+
+@Email=administrator@localhost
+@Password=Administrator1!
+@BearerToken=<YourToken>
+
+# POST Users Register
+POST {{Web_HostAddress}}/api/Users/Register
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+
+# @name login
+POST {{Web_HostAddress}}/api/Users/Login
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+@BearerToken = {{login.response.body.tokenType}} {{login.response.body.accessToken}}
+
+###
+
+# Create Configurations
+POST {{Web_HostAddress}}/api/Configurations
+Authorization: {{BearerToken}}
+Content-Type: application/json
+
+{
+  "Key": "Configurations 1",
+  "Value": "Configurations 1 description"
+}
+
+###
+
+# Get Configurations
+GET {{Web_HostAddress}}/api/Configurations
+Authorization: {{BearerToken}}
+
+###
+
+# Get Configurations by Id
+GET {{Web_HostAddress}}/api/Configurations/1
+Authorization: {{BearerToken}}
+
+###
+
+# Update Configurations
+PUT {{Web_HostAddress}}/api/Configurations/logo
+Authorization: {{BearerToken}}
+Content-Type: application/json
+
+{
+  "Key": "logo",
+  "Value": "files\\07892f8e-fc41-4188-bc8e-ec9722274cc8.png"
+}
+
+###
+
+# Delete Configurations
+DELETE {{Web_HostAddress}}/api/Configurations/1
+Authorization: {{BearerToken}}

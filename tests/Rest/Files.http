@@ -1,0 +1,53 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+@Web_HostAddress = https://localhost:5001
+
+@Email=administrator@localhost
+@Password=Administrator1!
+@BearerToken=<YourToken>
+
+# POST Users Register
+POST {{Web_HostAddress}}/api/Users/Register
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+
+# @name login
+POST {{Web_HostAddress}}/api/Users/Login
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+@BearerToken = {{login.response.body.tokenType}} {{login.response.body.accessToken}}
+
+###
+
+
+# Upload a file
+# @name upload
+POST {{Web_HostAddress}}/api/Files
+Authorization: {{BearerToken}}
+Content-Type: multipart/form-data; boundary=SpecialBoundary
+
+--SpecialBoundary
+Content-Disposition: form-data; name="file"; filename="image1.png"
+Content-Type: image/png
+
+< ./1.png
+--SpecialBoundary--
+
+###
+
+@FileId = {{upload.response.body.data}}
+
+# Remove a file
+DELETE {{Web_HostAddress}}/api/ /{{FileId}}
+Authorization: {{BearerToken}}

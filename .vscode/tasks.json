@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "dotnet",
+      "task": "build",
+      "args": [
+        "${workspaceFolder}/src/Web/Web.csproj"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "label": "build Web project"
+    },
+    {
+      "type": "dotnet",
+      "task": "restore",
+      "args": [
+        "${workspaceFolder}/Backend.sln"
+      ],
+      "group": "none",
+      "problemMatcher": [],
+      "label": "restore solution dependencies"
+    }
+  ]
+}

@@ -1,0 +1,258 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+@Web_HostAddress = https://localhost:5001
+
+@Email=administrator@localhost
+@Password=Administrator1!
+@BearerToken=<YourToken>
+
+# POST Users Register
+POST {{Web_HostAddress}}/api/Users/Register
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+
+# @name login
+POST {{Web_HostAddress}}/api/Users/Login
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+@BearerToken = {{login.response.body.tokenType}} {{login.response.body.accessToken}}
+
+###
+
+
+# @name GetProducts
+GET {{Web_HostAddress}}/api/Products
+Authorization: {{BearerToken}}
+
+###
+
+# @name GetProduct
+GET {{Web_HostAddress}}/api/Products/17
+Authorization: {{BearerToken}}
+
+###
+
+# @name CreateProduct
+POST {{Web_HostAddress}}/api/Products
+Authorization: {{BearerToken}}
+Content-Type: multipart/form-data; boundary=SpecialBoundary
+
+--SpecialBoundary
+Content-Disposition: form-data; name="name"
+
+Pizza
+--SpecialBoundary
+Content-Disposition: form-data; name="price"
+
+10
+--SpecialBoundary
+Content-Disposition: form-data; name="categoryId"
+
+1
+
+--SpecialBoundary
+Content-Disposition: form-data; name="description"
+
+Delicious pizza
+--SpecialBoundary
+Content-Disposition: form-data; name="features"
+
+{"size": "large", "toppings": ["cheese", "pepperoni"]}
+--SpecialBoundary
+Content-Disposition: form-data; name="isNew"
+
+true
+--SpecialBoundary
+Content-Disposition: form-data; name="isActive"
+
+true
+--SpecialBoundary
+Content-Disposition: form-data; name="Images"; filename="image1.png"
+Content-Type: image/png
+
+< ./1.png
+--SpecialBoundary
+Content-Disposition: form-data; name="Images"; filename="image2.png"
+Content-Type: image/png
+
+< ./2.png
+--SpecialBoundary
+Content-Disposition: form-data; name="Images"; filename="image3.png"
+Content-Type: image/png
+
+< ./3.png
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[0].IsMain"
+
+true
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[0].AltText"
+
+Main Image Alt Text
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[1].IsMain"
+
+false
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[1].AltText"
+
+Secondary Image Alt Text
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[2].IsMain"
+
+false
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[2].AltText"
+
+Secondary Image Alt Text
+--SpecialBoundary--
+
+###
+
+# @name UpdateProduct
+POST {{Web_HostAddress}}/api/Products/3
+Authorization: {{BearerToken}}
+Content-Type: multipart/form-data; boundary=SpecialBoundary
+
+--SpecialBoundary
+Content-Disposition: form-data; name="id"
+
+1
+--SpecialBoundary
+Content-Disposition: form-data; name="name"
+
+Pizza1
+--SpecialBoundary
+Content-Disposition: form-data; name="price"
+
+11
+--SpecialBoundary
+Content-Disposition: form-data; name="categoryId"
+
+1
+--SpecialBoundary
+Content-Disposition: form-data; name="description"
+
+Delicious pizza1
+--SpecialBoundary
+Content-Disposition: form-data; name="features"
+
+{"size": "small", "toppings": ["cheese", "pepperoni", "mushrooms"]}
+--SpecialBoundary
+Content-Disposition: form-data; name="isNew"
+
+false
+--SpecialBoundary
+Content-Disposition: form-data; name="isActive"
+
+false
+--SpecialBoundary--
+
+
+###
+
+# @name DeleteProduct
+DELETE {{Web_HostAddress}}/api/Products/1
+Authorization: {{BearerToken}}
+
+###
+
+# @name UpdateProduct(ImageManupilation)
+POST {{Web_HostAddress}}/api/Products/3
+Authorization: {{BearerToken}}
+Content-Type: multipart/form-data; boundary=SpecialBoundary
+
+--SpecialBoundary
+Content-Disposition: form-data; name="id"
+
+17
+--SpecialBoundary
+Content-Disposition: form-data; name="name"
+
+Pizza1
+--SpecialBoundary
+Content-Disposition: form-data; name="price"
+
+101
+--SpecialBoundary
+Content-Disposition: form-data; name="categoryId"
+
+12
+--SpecialBoundary
+Content-Disposition: form-data; name="description"
+
+Delicious pizza1111
+--SpecialBoundary
+Content-Disposition: form-data; name="features"
+
+{"size": "zbat"}
+--SpecialBoundary
+Content-Disposition: form-data; name="isNew"
+
+true
+--SpecialBoundary
+Content-Disposition: form-data; name="isActive"
+
+true
+--SpecialBoundary
+Content-Disposition: form-data; name="NewImages"; filename="image1.png"
+Content-Type: image/png
+
+< ./1.png
+--SpecialBoundary
+Content-Disposition: form-data; name="NewImages"; filename="image2.png"
+Content-Type: image/png
+
+< ./2.png
+Content-Disposition: form-data; name="ImagesDetails[0].IsMain"
+
+true
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[0].AltText"
+
+Main Image Alt Text
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[1].IsMain"
+
+false
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[1].AltText"
+
+Secondary Image Alt Text
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[2].Id"
+
+7
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[2].ToBeDeleted"
+
+true
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[3].Id"
+
+8
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[3].ToBeDeleted"
+
+true
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[4].Id"
+
+6
+--SpecialBoundary
+Content-Disposition: form-data; name="ImagesDetails[4].ToBeDeleted"
+
+true
+
+--SpecialBoundary--

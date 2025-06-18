@@ -1,0 +1,118 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+@Web_HostAddress = https://localhost:5001
+
+@Email=administrator@localhost
+@Password=Administrator1!
+@BearerToken=<YourToken>
+
+# POST Users Register
+POST {{Web_HostAddress}}/api/Users/Register
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+
+# @name login
+POST {{Web_HostAddress}}/api/Users/Login
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+@BearerToken = {{login.response.body.tokenType}} {{login.response.body.accessToken}}
+
+###
+
+# Create Configurations
+# POST {{Web_HostAddress}}/api/Configurations
+# Authorization: {{BearerToken}}
+# Content-Type: application/json
+
+
+# public record ContactFormAddDto
+# {
+#     public int Id { get; init; }
+#     public string? Name { get; set; }
+#     public string? Email { get; set; }
+#     public string? Message { get; set; }
+#     public string? Phone { get; set; }
+#     public string? Subject { get; set; }
+#     public int ProductId { get; set; }
+
+# }
+
+
+# public record ContactFormUpdateStatusDto
+# {
+#     public int Id { get; init; }
+#     public bool IsRead { get; set; }
+#     public bool IsReplied { get; set; }
+# }
+
+
+#      app.MapGroup(this)
+            # .RequireAuthorization()
+            # .MapGet(GetContactForms)
+            # .MapGet(GetContactForm, "{id}")
+            # .MapPost(CreateContactForm)
+            # .MapPut(UpdateContactFormStatus, "{id}")
+            # .MapDelete(DeleteContactForm, "{id}");
+
+#  Generate all the CRUD operations for ContactForm
+# 1. Create ContactForm
+
+POST {{Web_HostAddress}}/api/ContactForms
+Authorization: {{BearerToken}}
+Content-Type: application/json
+
+{
+  "Name": "ContactForm 1",
+  "Email": "user@email.com",
+  "Message": "ContactForm 1 description",
+  "Phone": "22002200",
+  "Subject": "ContactForm 1 description",
+  "ProductId": 6
+}
+
+###
+
+# 2. Get ContactForms
+
+GET {{Web_HostAddress}}/api/ContactForms
+Authorization: {{BearerToken}}
+
+###
+
+# 3. Get ContactForm by Id
+
+GET {{Web_HostAddress}}/api/ContactForms/1
+Authorization: {{BearerToken}}
+
+###
+
+# 4. Update ContactForm
+
+PUT {{Web_HostAddress}}/api/ContactForms/1
+Authorization: {{BearerToken}}
+Content-Type: application/json
+
+{
+  "Id": 1,
+  "IsRead": false,
+  "IsReplied": true
+}
+
+###
+
+# 5. Delete ContactForm
+
+DELETE {{Web_HostAddress}}/api/ContactForms/1
+Authorization: {{BearerToken}}
+
