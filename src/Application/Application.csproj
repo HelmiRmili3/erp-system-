@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Attendance\Commands\" />
-    <Folder Include="Features\Attendance\Dto\" />
-    <Folder Include="Features\Attendance\IRepositories\" />
-    <Folder Include="Features\Attendance\Queries\" />
     <Folder Include="Features\Expense\Commands\" />
     <Folder Include="Features\Expense\Dto\" />
     <Folder Include="Features\Expense\IRepositories\" />

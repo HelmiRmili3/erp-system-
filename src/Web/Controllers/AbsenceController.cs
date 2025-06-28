@@ -1,6 +1,5 @@
 ﻿using Backend.Application.Features.Absences.Commands;
 using Backend.Application.Features.Absences.Queries;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

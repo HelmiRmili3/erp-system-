@@ -1,6 +1,4 @@
-﻿
-using Backend.Application.Features.Absences.IRepositories;
-using Backend.Domain.Entities;
+﻿using Backend.Application.Features.Absences.IRepositories;
 using Backend.Infrastructure.Data;
 using Backend.Infrastructure.Repository.Command.Base;
 

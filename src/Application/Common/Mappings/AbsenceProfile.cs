@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Backend.Application.Features.Absences.Dto;
-using Backend.Domain.Entities;
+﻿using Backend.Application.Features.Absences.Dto;
 
 namespace Backend.Application.Common.Mappings;
 

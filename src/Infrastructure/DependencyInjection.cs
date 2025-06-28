@@ -144,6 +144,11 @@ public static class DependencyInjection
 
         builder.Services.AddTransient<IAbsenceCommandRepository, AbsenceCommandRepository>();
         builder.Services.AddTransient<IAbsenceQueryRepository, AbsenceQueryRepository>();
+        // Attendance 
+
+        builder.Services.AddTransient<IAttendanceCommandRepository, AttendanceCommandRepository>();
+        builder.Services.AddTransient<IAttendanceQueryRepository, AttendanceQueryRepository>();
+
 
 
 

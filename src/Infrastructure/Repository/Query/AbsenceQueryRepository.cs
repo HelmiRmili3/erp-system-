@@ -1,5 +1,4 @@
 ﻿using Backend.Application.Features.Absences.IRepositories;
-using Backend.Domain.Entities;
 using Backend.Infrastructure.Data;
 using Backend.Infrastructure.Repository.Query.Base;
 
