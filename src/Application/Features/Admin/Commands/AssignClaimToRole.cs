@@ -1,17 +1,11 @@
 ﻿using Backend.Application.Abstractions;
-using Backend.Application.Common.Response;
-using Backend.Domain.Constants;
-
-using Microsoft.AspNetCore.Identity;
-using System.Reflection;
-using System.Security.Claims;
-
+using Backend.Application.Common.Models;
 
 namespace Backend.Application.Features.Admin.Commands
 {
-    public record AssignClaimToRoleCommand(string RoleId, string ClaimType, string ClaimValue) : IRequest<Response<string>>;
+    public record AssignClaimToRoleCommand(string roleName, string ClaimType, string ClaimValue) : IRequest<Result>;
 
-    public class AssignClaimToRoleCommandHandler : IRequestHandler<AssignClaimToRoleCommand, Response<string>>
+    public class AssignClaimToRoleCommandHandler : IRequestHandler<AssignClaimToRoleCommand, Result>
     {
         private readonly IAdminCommandRepository _adminRepository;
 
@@ -22,10 +16,10 @@ namespace Backend.Application.Features.Admin.Commands
 
        
 
-        public async Task<Response<string>> Handle(AssignClaimToRoleCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(AssignClaimToRoleCommand request, CancellationToken cancellationToken)
         {
 
-         return   await _adminRepository.AssignClaimToRoleAsync(request.RoleId,request.ClaimType,request.ClaimValue);
+         return   await _adminRepository.AssignClaimToRoleAsync(request.roleName, request.ClaimType,request.ClaimValue);
 
         }
     }
@@ -34,7 +28,7 @@ namespace Backend.Application.Features.Admin.Commands
     {
         public AssignClaimToRoleCommandValidator()
         {
-            RuleFor(v => v.RoleId)
+            RuleFor(v => v.roleName)
                 .NotEmpty()
                 .WithMessage("Role ID is required");
 

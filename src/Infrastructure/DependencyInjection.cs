@@ -3,7 +3,6 @@ using Backend.Domain.Constants;
 using Backend.Infrastructure.Data;
 using Backend.Infrastructure.Data.Interceptors;
 using Backend.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +23,9 @@ using Microsoft.IdentityModel.Tokens;
 using Backend.Application.Common.Settings;
 using Backend.Application.Features.Authentication.IRepositories;
 using Backend.Application.Abstractions;
+using Microsoft.AspNetCore.Http;
+using Backend.Application.Features.Admin.IRepositories;
+using Backend.Application.Features.Absences.IRepositories;
 
 namespace Backend.Infrastructure;
 
@@ -86,6 +88,26 @@ public static class DependencyInjection
                 ClockSkew = TimeSpan.FromMinutes(5),
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
             };
+            options.Events = new JwtBearerEvents
+            {
+                OnChallenge = context =>
+                {
+                    // Prevent the default behavior
+                    context.HandleResponse();
+
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.ContentType = "application/json";
+
+                    var response = new
+                    {
+                        succeeded = false,
+                        message = "Unauthorized access. Please log in."
+                    };
+
+                    var json = System.Text.Json.JsonSerializer.Serialize(response);
+                    return context.Response.WriteAsync(json);
+                }
+            };
         });
 
         builder.Services.AddAuthorizationBuilder();
@@ -105,6 +127,7 @@ public static class DependencyInjection
         // Add your repositories here
         // Admin
         builder.Services.AddTransient<IAdminCommandRepository, AdminCommandRepository>();
+        builder.Services.AddScoped<IAdminQueryRepository, AdminQueryRepository>();
         // Category
         builder.Services.AddTransient<ICategoryCommandRepository, CategoryCommandRepository>();
         builder.Services.AddTransient<ICategoryQueryRepository, CategoryQueryRepository>();
@@ -116,6 +139,11 @@ public static class DependencyInjection
         builder.Services.AddTransient<IEmployeeQueryRepository, EmployeeQueryRepository>();
         //Authentication
         builder.Services.AddTransient<IAuthenticationCommandRepository, AuthenticationCommandRepository>();
+        builder.Services.AddScoped<IAuthenticationQueryRepository, AuthenticationQueryRepository>();
+        // Absence
+
+        builder.Services.AddTransient<IAbsenceCommandRepository, AbsenceCommandRepository>();
+        builder.Services.AddTransient<IAbsenceQueryRepository, AbsenceQueryRepository>();
 
 
 

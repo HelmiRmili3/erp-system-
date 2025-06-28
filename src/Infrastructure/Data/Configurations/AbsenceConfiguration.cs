@@ -1,46 +1,43 @@
-//using Backend.Domain.Entities;
-//using Backend.Domain.Enums;
-//using Microsoft.EntityFrameworkCore;
-//using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Backend.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-//namespace Backend.Infrastructure.Data.Configurations;
+namespace Backend.Infrastructure.Data.Configurations;
 
-//public class AbsenceConfiguration : IEntityTypeConfiguration<Absence>
-//{
-//    public void Configure(EntityTypeBuilder<Absence> builder)
-//    {
-//        builder.ToTable("Absences");
+public class AbsenceConfiguration : IEntityTypeConfiguration<Absence>
+{
+    public void Configure(EntityTypeBuilder<Absence> builder)
+    {
+        builder.ToTable("Absences");
 
-//        builder.Property(a => a.StartDate)
-//            .IsRequired();
+        builder.HasKey(a => a.Id);
 
-//        builder.Property(a => a.EndDate)
-//            .IsRequired();
+        builder.Property(a => a.UserId)
+            .IsRequired()
+            .HasMaxLength(100);
 
-//        builder.Property(a => a.AbsenceType)
-//            .IsRequired()
-//            .HasMaxLength(50);
+        builder.Property(a => a.StartDate)
+            .IsRequired();
 
-//        builder.Property(a => a.StatusType)
-//            .IsRequired()
-//            .HasMaxLength(20);
+        builder.Property(a => a.EndDate)
+            .IsRequired();
 
-//        builder.Property(a => a.Reason)
-//            .HasMaxLength(500);
+        builder.Property(a => a.AbsenceType)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(50);
 
-      
-      
-//        // Indexes for performance
-//        builder.HasIndex(a => a.EmployeeId);
-//        builder.HasIndex(a => a.StartDate);
-//        builder.HasIndex(a => a.EndDate);
-//        builder.HasIndex(a => a.StatusType);
-//        builder.HasIndex(a => new { a.EmployeeId, a.StartDate, a.EndDate });
+        builder.Property(a => a.StatusType)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20);
 
-//        // Relationship with Employee
-//        builder.HasOne(a => a.Employee)
-//            .WithMany(e => e.Absences)
-//            .HasForeignKey(a => a.EmployeeId)
-//            .OnDelete(DeleteBehavior.Cascade);
-//    }
-//}
+        builder.Property(a => a.Reason)
+            .HasMaxLength(500);
+
+        builder.HasOne<ApplicationUser>()
+            .WithMany()
+            .HasForeignKey(a => a.UserId)
+            .OnDelete(DeleteBehavior.Cascade); // or Cascade if you prefer
+    }
+}

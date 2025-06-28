@@ -1,115 +1,118 @@
 ﻿using System.Reflection;
 using System.Security.Claims;
 using Backend.Application.Abstractions;
-using Backend.Application.Common.Response;
+using Backend.Application.Common.Models;
 using Backend.Domain.Constants;
-using Backend.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 
-namespace Backend.Infrastructure.Repository.Command
+namespace Backend.Infrastructure.Repository.Command;
+
+public class AdminCommandRepository : IAdminCommandRepository
 {
-    public class AdminCommandRepository : IAdminCommandRepository
+    private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public AdminCommandRepository(RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
     {
-        private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly UserManager<ApplicationUser> _userManager;
+        _roleManager = roleManager;
+        _userManager = userManager;
+    }
 
-        public AdminCommandRepository(RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
+    public async Task<Result> CreateRoleAsync(string roleName)
+    {
+        bool RoleExists(string type)
         {
-            _roleManager = roleManager;
-            _userManager = userManager;
+            var roleConstants = typeof(Roles).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            return roleConstants.Any(field => field.GetValue(null)?.ToString() == type);
         }
 
-        public async Task<Response<string>> CreateRoleAsync(string roleName)
+        if (!RoleExists(roleName))
+            return Result.Failure(new[] { "Role type does not exist" });
+
+        if (await _roleManager.RoleExistsAsync(roleName))
+            return Result.Failure(new[] { "Role already exists" });
+
+        var role = new ApplicationRole(roleName);
+        var result = await _roleManager.CreateAsync(role);
+
+        if (!result.Succeeded)
+            return Result.Failure(result.Errors.Select(e => e.Description));
+
+        return Result.Success();
+    }
+
+    public async Task<Result> AssignClaimToRoleAsync(string roleName, string claimType, string claimValue)
+    {
+        bool ClaimExists(string type)
         {
-            if (await _roleManager.RoleExistsAsync(roleName))
-            {
-                throw new ApplicationException("Role already exists");
-            }
-
-            var role = new ApplicationRole(roleName);
-            var result = await _roleManager.CreateAsync(role);
-
-            if (!result.Succeeded)
-            {
-                throw new ApplicationException("Role could not be created");
-            }
-
-            return new Response<String>(roleName, "Role created successfully");
+            var claimConstants = typeof(Claims).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            return claimConstants.Any(field => field.GetValue(null)?.ToString() == type);
         }
 
-        public async Task<Response<string>> AssignClaimToRoleAsync(string roleName, string claimType, string claimValue)
-        {
-            bool ClaimExists(string type)
-            {
-                var claimConstants = typeof(Claims).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                return claimConstants.Any(field => field.GetValue(null)?.ToString() == type);
-            }
+        if (!ClaimExists(claimType))
+            return Result.Failure(new[] { "Claim type does not exist" });
 
-            if (!ClaimExists(claimType))
-                throw new ApplicationException("Claim type does not exist");
+        var role = await _roleManager.FindByNameAsync(roleName);
+        if (role == null)
+            return Result.Failure(new[] { "Role not found" });
 
-            var role = await _roleManager.FindByNameAsync(roleName);
-            if (role == null)
-                throw new ApplicationException("Role not found");
+        var roleClaims = await _roleManager.GetClaimsAsync(role);
+        if (roleClaims.Any(rc => rc.Type == claimType && rc.Value == claimValue))
+            return Result.Failure(new[] { "Claim already assigned to role" });
 
-            var roleClaims = await _roleManager.GetClaimsAsync(role);
-            if (roleClaims.Any(rc => rc.Type == claimType && rc.Value == claimValue))
-                throw new ApplicationException("Claim already assigned to role");
+        var result = await _roleManager.AddClaimAsync(role, new Claim(claimType, claimValue));
+        if (!result.Succeeded)
+            return Result.Failure(result.Errors.Select(e => e.Description));
 
-            var result = await _roleManager.AddClaimAsync(role, new Claim(claimType, claimValue));
-            if (!result.Succeeded)
-                throw new ApplicationException("Failed to assign claim to role");
+        return Result.Success();
+    }
 
-            return new Response<string>(roleName, "Claim assigned to role successfully");
-        }
+    public async Task<Result> AssignRoleToUserAsync(string userId, string roleName)
+    {
+        var role = await _roleManager.FindByNameAsync(roleName);
+        if (role == null)
+            return Result.Failure(new[] { "Role not found" });
 
-        public async Task<Response<string>> AssignRoleToUserAsync(string userId, string roleName)
-        {
-            var role = await _roleManager.FindByNameAsync(roleName);
-            if (role == null)
-                throw new ApplicationException("Role not found");
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            return Result.Failure(new[] { "User not found" });
 
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                throw new ApplicationException("User not found");
+        var result = await _userManager.AddToRoleAsync(user, roleName);
+        if (!result.Succeeded)
+            return Result.Failure(result.Errors.Select(e => e.Description));
 
-            var result = await _userManager.AddToRoleAsync(user, roleName);
-            if (!result.Succeeded)
-                throw new ApplicationException("Role could not be assigned to user");
+        return Result.Success();
+    }
 
-            return new Response<string>(userId, "Role assigned to user successfully");
-        }
+    public async Task<Result> DeleteRoleAsync(string roleId)
+    {
+        var role = await _roleManager.FindByIdAsync(roleId);
+        if (role == null)
+            return Result.Failure(new[] { "Role not found" });
 
-        public async Task<Response<string>> DeleteRoleAsync(string roleId)
-        {
-            var role = await _roleManager.FindByIdAsync(roleId);
-            if (role == null)
-                throw new ApplicationException("Role not found");
+        var result = await _roleManager.DeleteAsync(role);
+        if (!result.Succeeded)
+            return Result.Failure(result.Errors.Select(e => e.Description));
 
-            var result = await _roleManager.DeleteAsync(role);
-            if (!result.Succeeded)
-                throw new ApplicationException("Role could not be deleted");
+        return Result.Success();
+    }
 
-            return new Response<string>(roleId, "Role deleted successfully");
-        }
+    public async Task<Result> DeleteClaimAsync(string roleId, string claimType, string claimValue)
+    {
+        var role = await _roleManager.FindByIdAsync(roleId);
+        if (role == null)
+            return Result.Failure(new[] { "Role not found" });
 
-        public async Task<Response<string>> DeleteClaimAsync(string roleId, string claimType, string claimValue)
-        {
-            var role = await _roleManager.FindByIdAsync(roleId);
-            if (role == null)
-                throw new ApplicationException("Role not found");
+        var claims = await _roleManager.GetClaimsAsync(role);
+        var roleClaim = claims.FirstOrDefault(c => c.Type == claimType && c.Value == claimValue);
 
-            var claims = await _roleManager.GetClaimsAsync(role);
-            var roleClaim = claims.FirstOrDefault(c => c.Type == claimType && c.Value == claimValue);
+        if (roleClaim == null)
+            return Result.Failure(new[] { "Claim not found in role" });
 
-            if (roleClaim == null)
-                throw new ApplicationException("Claim not found in role");
+        var result = await _roleManager.RemoveClaimAsync(role, roleClaim);
+        if (!result.Succeeded)
+            return Result.Failure(result.Errors.Select(e => e.Description));
 
-            var result = await _roleManager.RemoveClaimAsync(role, roleClaim);
-            if (!result.Succeeded)
-                throw new ApplicationException("Claim could not be removed from role");
-
-            return new Response<string>(roleId, "Claim removed from role successfully");
-        }
+        return Result.Success();
     }
 }

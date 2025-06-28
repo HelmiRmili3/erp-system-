@@ -1,12 +1,13 @@
 ﻿using Backend.Application.Abstractions;
+using Backend.Application.Common.Models;
 using Backend.Application.Common.Response;
 using Microsoft.AspNetCore.Identity;
 
 namespace Backend.Application.Features.Admin.Commands
 {
-    public record DeleteRoleCommand(string RoleId) : IRequest<Response<string>>;
+    public record DeleteRoleCommand(string RoleId) : IRequest<Result>;
 
-    public class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Response<string>>
+    public class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Result>
     {
         private readonly IAdminCommandRepository _adminRepository;
 
@@ -15,7 +16,7 @@ namespace Backend.Application.Features.Admin.Commands
             _adminRepository = adminRepository;
         }
 
-        public async Task<Response<string>> Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
         {
             return await _adminRepository.DeleteRoleAsync(request.RoleId);
         

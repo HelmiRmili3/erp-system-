@@ -8,35 +8,51 @@ namespace Backend.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Attendance> builder)
         {
-            // Define the table that the entity maps to
             builder.ToTable("Attendance");
 
-            // Define the primary key
             builder.HasKey(a => a.Id);
 
-            // Define the relationship with the Employee entity
-            builder.HasOne(a => a.Employee)
-                .WithMany(e => e.Attendances)
-                .HasForeignKey(a => a.EmployeeId)
-                .OnDelete(DeleteBehavior.Restrict);
+ 
+            // Required
+            builder.Property(a => a.UserId)
+                   .IsRequired();
+         
+            builder.Property(a => a.AttendanceDate)
+                   .IsRequired();
 
-            // Define the required properties
-            builder.Property(a => a.Date)
-                .IsRequired();
+            builder.Property(a => a.CheckInMethod)
+                   .IsRequired()
+                   .HasMaxLength(50);
 
-            builder.Property(a => a.IsPresent)
-                .IsRequired();
+            // Optional
+            builder.Property(a => a.CheckIn)
+                   .IsRequired(false);
 
-            // Define the optional properties
-            builder.Property(a => a.StartTime)
-                .IsRequired(false);
+            builder.Property(a => a.CheckOut)
+                   .IsRequired(false);
 
-            builder.Property(a => a.EndTime)
-                .IsRequired(false);
+            builder.Property(a => a.IpAddress)
+                   .HasMaxLength(45)
+                   .IsRequired(false);
 
-            builder.Property(a => a.Remarks)
-                .IsRequired(false)
-                .HasMaxLength(256);
+            builder.Property(a => a.Latitude)
+                   .IsRequired(false);
+
+            builder.Property(a => a.Longitude)
+                   .IsRequired(false);
+
+            builder.Property(a => a.DeviceId)
+                   .HasMaxLength(100)
+                   .IsRequired(false);
+
+            builder.Property(a => a.Notes)
+                   .HasMaxLength(256)
+                   .IsRequired(false);
+            builder.HasOne<ApplicationUser>()
+            .WithMany()
+            .HasForeignKey(a => a.UserId)
+            .OnDelete(DeleteBehavior.Cascade); // or Cascade if you prefer
         }
     }
 }
+

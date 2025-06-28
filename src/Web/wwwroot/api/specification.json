@@ -6,6 +6,230 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/Absence": {
+      "get": {
+        "tags": [
+          "Absence"
+        ],
+        "operationId": "Absence_GetAbsences",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Absence"
+        ],
+        "operationId": "Absence_CreateAbsence",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAbsenceCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Absence/{id}": {
+      "get": {
+        "tags": [
+          "Absence"
+        ],
+        "operationId": "Absence_GetAbsence",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Absence"
+        ],
+        "operationId": "Absence_UpdateAbsence",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAbsenceCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Absence"
+        ],
+        "operationId": "Absence_DeleteAbsence",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Absence/my": {
+      "get": {
+        "tags": [
+          "Absence"
+        ],
+        "operationId": "Absence_GetMyAbsences",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Admin/create-role": {
       "post": {
         "tags": [
@@ -36,10 +260,17 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       }
     },
-    "/api/Admin/assign-permission-to-role": {
+    "/api/Admin/assign-claim-to-role": {
       "post": {
         "tags": [
           "Admin"
@@ -69,7 +300,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       }
     },
     "/api/Admin/assign-role-to-user": {
@@ -102,7 +340,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       }
     },
     "/api/Admin/delete-role": {
@@ -135,7 +380,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       }
     },
     "/api/Admin/delete-claim": {
@@ -168,7 +420,205 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/Admin/claims": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_GetClaims",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/Admin/claims-with-roles": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_GetClaimsWithRoles",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/Admin/claim/{id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_GetClaimById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/Admin/roles": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_GetRoles",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/Admin/role/{id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_GetRoleById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/Admin/roles-with-claims": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_GetRolesWithClaims",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       }
     },
     "/api/Auth/login": {
@@ -241,37 +691,50 @@
         }
       }
     },
-    "/api/Employees": {
-      "get": {
-        "tags": [
-          "Employees"
-        ],
-        "operationId": "Employees_GetEmployees",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/api/Auth/refresh": {
       "post": {
         "tags": [
-          "Employees"
+          "Auth"
         ],
-        "operationId": "Employees_CreateEmployee",
+        "operationId": "Auth_Refresh",
         "requestBody": {
           "x-name": "command",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateEmployeeCommand"
+                "type": "string"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Auth/change-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Auth_ChangePassword",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
               }
             }
           },
@@ -298,24 +761,12 @@
         ]
       }
     },
-    "/api/Employees/{id}": {
+    "/api/Auth/current-user": {
       "get": {
         "tags": [
-          "Employees"
+          "Auth"
         ],
-        "operationId": "Employees_GetEmployee",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
+        "operationId": "Auth_Me",
         "responses": {
           "200": {
             "description": "",
@@ -324,38 +775,6 @@
                 "schema": {
                   "type": "string",
                   "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Employees"
-        ],
-        "operationId": "Employees_DeleteEmployee",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -371,6 +790,135 @@
   },
   "components": {
     "schemas": {
+      "CreateAbsenceCommand": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AbsenceAddDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "AbsenceAddDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "absenceType": {
+            "$ref": "#/components/schemas/AbsenceType"
+          },
+          "statusType": {
+            "$ref": "#/components/schemas/AbsenceStatus"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AbsenceType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Vacation",
+          "Sick",
+          "Personal",
+          "Bereavement",
+          "Other"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "AbsenceStatus": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Pending",
+          "Approved",
+          "Rejected",
+          "Cancelled"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "UpdateAbsenceCommand": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AbsenceUpdateDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "AbsenceUpdateDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AbsenceAddDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "CreateRoleCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -384,7 +932,7 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "roleId": {
+          "roleName": {
             "type": "string"
           },
           "claimType": {
@@ -431,35 +979,6 @@
           }
         }
       },
-      "ProblemDetails": {
-        "type": "object",
-        "additionalProperties": {
-          "nullable": true
-        },
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
       "LoginUserCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -476,37 +995,42 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "userName": {
+          "data": {
+            "$ref": "#/components/schemas/RegisterDto"
+          }
+        }
+      },
+      "RegisterDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "email": {
             "type": "string"
           },
-          "email": {
+          "userName": {
             "type": "string"
           },
           "password": {
             "type": "string"
-          }
-        }
-      },
-      "CreateEmployeeCommand": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EmployeeAddDto"
           },
-          {
-            "type": "object",
-            "additionalProperties": false
-          }
-        ]
-      },
-      "EmployeeAddDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
           "firstName": {
             "type": "string"
           },
           "lastName": {
             "type": "string"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
           },
           "jobTitle": {
             "type": "string"
@@ -516,15 +1040,53 @@
           },
           "hireDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "contractType": {
-            "type": "string"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContractType"
+              }
+            ]
           },
           "status": {
-            "type": "string"
+            "$ref": "#/components/schemas/EmployeeStatus"
           }
         }
+      },
+      "ContractType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Permanent",
+          "Temporary",
+          "Freelance"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "EmployeeStatus": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Active",
+          "Inactive",
+          "Terminated"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "additionalProperties": false
       }
     },
     "securitySchemes": {

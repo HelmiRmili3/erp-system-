@@ -1,4 +1,4 @@
-﻿namespace Backend.Domain.Entities;
+﻿using Backend.Domain.Entities;
 public class RefreshToken
 {
     public int Id { get; set; }

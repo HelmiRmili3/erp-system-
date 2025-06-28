@@ -1,11 +1,11 @@
 ﻿using Backend.Application.Abstractions;
-using Backend.Application.Common.Response;
+using Backend.Application.Common.Models;
 
 namespace Backend.Application.Features.Admin.Commands
 {
-    public record DeleteRoleClaimCommand(string RoleId, string ClaimType, string ClaimValue) : IRequest<Response<string>>;
+    public record DeleteRoleClaimCommand(string RoleId, string ClaimType, string ClaimValue) : IRequest<Result>;
 
-    public class DeleteRoleClaimCommandHandler : IRequestHandler<DeleteRoleClaimCommand, Response<string>>
+    public class DeleteRoleClaimCommandHandler : IRequestHandler<DeleteRoleClaimCommand, Result>
     {
         private readonly IAdminCommandRepository _adminRepository;
 
@@ -14,7 +14,7 @@ namespace Backend.Application.Features.Admin.Commands
             _adminRepository = adminRepository;
         }
 
-        public async Task<Response<string>> Handle(DeleteRoleClaimCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(DeleteRoleClaimCommand request, CancellationToken cancellationToken)
         {
             // Find the role by ID
             return await _adminRepository.DeleteClaimAsync(request.RoleId,request.ClaimType, request.ClaimValue);

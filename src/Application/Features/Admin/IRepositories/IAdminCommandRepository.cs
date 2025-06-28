@@ -1,15 +1,12 @@
-﻿using System.Threading.Tasks;
-using Backend.Application.Common.Response;
-using Microsoft.AspNetCore.Identity;
-
+﻿using Backend.Application.Common.Models;
 namespace Backend.Application.Abstractions
 {
     public interface IAdminCommandRepository
     {
-        Task<Response<String>> CreateRoleAsync(string roleName);
-        Task<Response<string>> AssignClaimToRoleAsync(string roleId, string claimType, string claimValue);
-        Task<Response<string>> AssignRoleToUserAsync(string userId, string roleName);
-        Task<Response<string>> DeleteRoleAsync(string roleName);
-        Task<Response<string>> DeleteClaimAsync(string roleName, string claimType, string claimValue);
+        Task<Result> CreateRoleAsync(string roleName);
+        Task<Result> AssignClaimToRoleAsync(string roleId, string claimType, string claimValue);
+        Task<Result> AssignRoleToUserAsync(string userId, string roleName);
+        Task<Result> DeleteRoleAsync(string roleName);
+        Task<Result> DeleteClaimAsync(string roleName, string claimType, string claimValue);
     }
 }

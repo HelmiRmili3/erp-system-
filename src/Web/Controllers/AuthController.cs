@@ -1,5 +1,8 @@
+using System.Security.Claims;
 using Backend.Application.Features.Authentication.Commands;
-using MediatR;
+using Backend.Application.Features.Authentication.Dto;
+using Backend.Application.Features.Authentication.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -22,12 +25,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login([FromBody] LoginUserCommand command)
     {
-        var response = await _sender.Send(command);
-
-        if (!response.Succeeded)
-            return BadRequest(response);
-
-        return Ok(response);
+        var result = await _sender.Send(command);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
 
@@ -37,11 +36,40 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
     {
-        var response = await _sender.Send(command);
+        var result = await _sender.Send(command);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
+    }
+    [HttpPost("refresh")]
+    [Produces("application/json")]
+    public  Task<string> Refresh([FromBody] string command)
+    {
+        // This indicates the method is not yet implemented
+        throw new NotImplementedException("Refresh endpoint is not implemented yet.");
+    }
+    [HttpPost("change-password")]
+    [Authorize]
+    public  Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
+    {
+        //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //var result = await _userManager.ChangePasswordAsync(userId, request.OldPassword, request.NewPassword);
 
-        if (!response.Succeeded)
-            return BadRequest(response);
+        //if (!result)
+        //    return BadRequest(new { Message = "Password change failed" });
 
-        return Ok(response);
+        throw new NotImplementedException("Change password endpoint is not implemented yet.");
+
+    }
+    [HttpGet("current-user")]
+    [Authorize]
+    public async Task<IActionResult> Me()
+    {
+        // This works because "nameid" is ClaimTypes.NameIdentifier
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(new { Message = "User ID not found in token." });
+
+        var result = await _sender.Send(new GetCurrentUserQuery(userId));
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 }

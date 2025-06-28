@@ -1,6 +1,5 @@
 ﻿using Backend.Application.Common.Response;
 using Backend.Application.Features.Employees.IRepositories;
-using MediatR;
 
 namespace Backend.Application.Features.Employees.Commands;
 

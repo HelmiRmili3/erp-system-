@@ -8,7 +8,10 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 {
     public void Configure(EntityTypeBuilder<Employee> builder)
     {
-    
+        builder.ToTable("Employees");
+
+        builder.HasKey(e => e.Id);
+
         builder.Property(e => e.FirstName)
             .IsRequired()
             .HasMaxLength(100);
@@ -25,16 +28,6 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(e => e.HireDate)
-            .IsRequired();
-
-        builder.Property(e => e.ContractType)
-            .IsRequired()
-            .HasMaxLength(50);
-
-        builder.Property(e => e.Status)
-            .IsRequired()
-            .HasMaxLength(50);
-
+       
     }
 }

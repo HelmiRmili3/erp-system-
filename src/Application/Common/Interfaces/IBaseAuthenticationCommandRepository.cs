@@ -6,6 +6,8 @@ public interface IBaseAuthenticationCommandRepository
 {
     Task<Response<RegisterResultDto>> RegisterAsync(RegisterDto entity );
     Task<Response<LoginResultDto>> LoginAsync(string email, string password);
+
+    //Task<Response<RegisterResultDto>> GetProfile(string userId);
     //Task<T> RevokeTokenAsync(string userId);
     //Task<T> RefreshTokenAsync(string refreshToken);
     //Task<T> ChangePasswordAsync(string userId, string currentPassword, string newPassword);

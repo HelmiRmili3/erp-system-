@@ -11,9 +11,18 @@ namespace Backend.Infrastructure.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options), IApplicationDbContext
 {
-    public DbSet<Category> Categories => Set<Category>();
-    public DbSet<Configuration> Configurations => Set<Configuration>();
-    public DbSet<Employee> Employees => Set<Employee>();
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Configuration> Configurations { get; set; }
+    public DbSet<Employee> Employees { get; set; }
+    public DbSet<Absence> Absences { get; set; }
+    public DbSet<Attendance> Attendances { get; set; }
+    public DbSet<Contract> Contracts { get; set; }
+    public DbSet<Expense> Expenses { get; set; }
+    public DbSet<Payroll> Payrolls { get; set; }
+    public DbSet<Certification> Certifications { get; set; }
+
+
+
     public DbSet<ApplicationRole> ApplicationRoles => Set<ApplicationRole>();
 
     protected override void OnModelCreating(ModelBuilder builder)

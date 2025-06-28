@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Backend.Application.Features.Admin.Queries;
-internal class GetRolesWithPermissionsQuerie
+namespace Backend.Infrastructure.Repository.Query.Base;
+internal class BaseAuthenticationQueryRepository
 {
 }

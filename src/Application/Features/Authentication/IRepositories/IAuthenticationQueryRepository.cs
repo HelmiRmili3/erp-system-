@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Backend.Application.Common.Response;
+using Backend.Application.Features.Authentication.Dto;
 
 namespace Backend.Application.Features.Authentication.IRepositories;
-internal interface IAuthenticationQueryRepository
+public interface IAuthenticationQueryRepository
 {
+    Task<Response<RegisterResultDto>> GetUserById(string userId);
+
 }

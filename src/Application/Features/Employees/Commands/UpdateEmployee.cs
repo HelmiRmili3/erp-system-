@@ -5,6 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Backend.Application.Features.Employees.Commands;
-internal class UpdateEmployee
+public class UpdateEmployee
 {
 }

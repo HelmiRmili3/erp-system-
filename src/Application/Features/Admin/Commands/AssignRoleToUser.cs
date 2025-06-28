@@ -1,12 +1,13 @@
 ﻿using Backend.Application.Abstractions;
+using Backend.Application.Common.Models;
 using Backend.Application.Common.Response;
 using Microsoft.AspNetCore.Identity;
 
 namespace Backend.Application.Features.Admin.Commands
 {
-    public record AssignRoleToUserCommand(string UserId, string RoleName) : IRequest<Response<string>>;
+    public record AssignRoleToUserCommand(string UserId, string RoleName) : IRequest<Result>;
 
-    public class AssignRoleToUserCommandHandler : IRequestHandler<AssignRoleToUserCommand, Response<string>>
+    public class AssignRoleToUserCommandHandler : IRequestHandler<AssignRoleToUserCommand, Result>
     {
         private readonly IAdminCommandRepository _adminRepository;
 
@@ -16,7 +17,7 @@ namespace Backend.Application.Features.Admin.Commands
             _adminRepository = adminRepository;
         }
 
-        public async Task<Response<string>> Handle(AssignRoleToUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(AssignRoleToUserCommand request, CancellationToken cancellationToken)
         {
            return await _adminRepository.AssignRoleToUserAsync(request.UserId, request.RoleName);
         }
