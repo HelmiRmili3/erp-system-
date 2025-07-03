@@ -808,7 +808,7 @@
         "operationId": "Attendance_GetMyAttendances",
         "parameters": [
           {
-            "name": "month",
+            "name": "day",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -818,7 +818,7 @@
             "x-position": 1
           },
           {
-            "name": "year",
+            "name": "month",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -826,6 +826,16 @@
               "nullable": true
             },
             "x-position": 2
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 3
           }
         ],
         "responses": {
@@ -929,7 +939,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "string"
+                "$ref": "#/components/schemas/RefreshTokenCommand"
               }
             }
           },
@@ -940,9 +950,10 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -957,7 +968,7 @@
         ],
         "operationId": "Auth_ChangePassword",
         "requestBody": {
-          "x-name": "request",
+          "x-name": "dto",
           "content": {
             "application/json": {
               "schema": {
@@ -1224,46 +1235,97 @@
           "userId": {
             "type": "string"
           },
-          "attendanceDate": {
+          "attendanceDay": {
             "type": "string",
-            "format": "date-time"
-          },
-          "checkInMethod": {
-            "type": "string"
+            "format": "date"
           },
           "checkIn": {
             "type": "string",
-            "format": "date-time",
+            "format": "time",
             "nullable": true
+          },
+          "checkInMethod": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CheckMethod"
+              }
+            ]
+          },
+          "checkInLatitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "checkInLongitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "checkInDeviceId": {
+            "type": "string",
+            "nullable": true
+          },
+          "checkInIpAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "isCheckInByAdmin": {
+            "type": "boolean"
           },
           "checkOut": {
             "type": "string",
-            "format": "date-time",
+            "format": "time",
             "nullable": true
           },
-          "ipAddress": {
-            "type": "string",
-            "nullable": true
+          "checkOutMethod": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CheckMethod"
+              }
+            ]
           },
-          "latitude": {
+          "checkOutLatitude": {
             "type": "number",
             "format": "double",
             "nullable": true
           },
-          "longitude": {
+          "checkOutLongitude": {
             "type": "number",
             "format": "double",
             "nullable": true
           },
-          "deviceId": {
+          "checkOutDeviceId": {
             "type": "string",
             "nullable": true
           },
-          "notes": {
+          "checkOutIpAddress": {
             "type": "string",
             "nullable": true
+          },
+          "isCheckOutByAdmin": {
+            "type": "boolean"
           }
         }
+      },
+      "CheckMethod": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Website",
+          "Application",
+          "Machine",
+          "QrCode",
+          "NFC"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
       },
       "LoginUserCommand": {
         "type": "object",
@@ -1370,9 +1432,29 @@
           2
         ]
       },
+      "RefreshTokenCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
       "ChangePasswordDto": {
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          },
+          "confirmNewPassword": {
+            "type": "string"
+          }
+        }
       }
     },
     "securitySchemes": {

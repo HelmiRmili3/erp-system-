@@ -34,7 +34,7 @@ public static class DependencyInjection
     public static void AddInfrastructureServices(this IHostApplicationBuilder builder)
     {
 
-        var connectionString = builder.Configuration.GetConnectionString("BackendDb");
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
         if (jwtSettings == null)
         {

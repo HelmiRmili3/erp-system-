@@ -4,6 +4,7 @@ using Backend.Application.Features.Authentication.Dto;
 using Backend.Application.Features.Authentication.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
 namespace Backend.Web.Controllers;
@@ -41,24 +42,42 @@ public class AuthController : ControllerBase
     }
     [HttpPost("refresh")]
     [Produces("application/json")]
-    public  Task<string> Refresh([FromBody] string command)
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenCommand command)
     {
-        // This indicates the method is not yet implemented
-        throw new NotImplementedException("Refresh endpoint is not implemented yet.");
+        var result = await _sender.Send(command);
+
+        if (!result.Succeeded)
+            return BadRequest(new { result.Message, result.Errors });
+
+        return Ok(result);
     }
     [HttpPost("change-password")]
     [Authorize]
-    public  Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
     {
-        //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //var result = await _userManager.ChangePasswordAsync(userId, request.OldPassword, request.NewPassword);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(new { Message = "User ID not found in token." });
 
-        //if (!result)
-        //    return BadRequest(new { Message = "Password change failed" });
+        var dataWithId = new ChangePasswordDataDto
+        {
+            UserId = userId,
+            CurrentPassword = dto.CurrentPassword,
+            NewPassword = dto.NewPassword,
+            ConfirmNewPassword = dto.ConfirmNewPassword
+        };
 
-        throw new NotImplementedException("Change password endpoint is not implemented yet.");
+        var command = new ChangePasswordCommand(dataWithId);
+        var result = await _sender.Send(command);
+        Console.WriteLine($"Succeeded: {result.Succeeded}, Message: {result.Message}");
+
+        if (!result.Succeeded)
+            return BadRequest(new { Message = result.Message, Errors = result.Errors });
+
+        return Ok(result);
 
     }
+
     [HttpGet("current-user")]
     [Authorize]
     public async Task<IActionResult> Me()

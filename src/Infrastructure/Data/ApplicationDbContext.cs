@@ -1,11 +1,8 @@
 ﻿using System.Reflection;
-using Backend.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Backend.Application.Services;
-using Microsoft.AspNetCore.Identity;
-using Backend.Infrastructure.Identity;
 
 namespace Backend.Infrastructure.Data;
 

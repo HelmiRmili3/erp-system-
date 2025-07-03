@@ -31,51 +31,34 @@ namespace Backend.Infrastructure.Repository.Command.Base
         {
             try
             {
-                // Check if user already exists by email
                 var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
                 if (existingUser != null)
-                {
                     return new Response<RegisterResultDto>("User with this email already exists");
-                }
 
-                // Check if username already exists
                 var existingUserByName = await _userManager.FindByNameAsync(registerDto.UserName);
                 if (existingUserByName != null)
-                {
                     return new Response<RegisterResultDto>("Username already exists");
-                }
 
-                // Find admin by email (replace with your actual admin email)
-                var adminEmail = "administrator@localhost"; // Or get it from config
+                var adminEmail = "administrator@localhost"; // Or get from config
                 var adminUser = await _userManager.FindByEmailAsync(adminEmail);
-
                 if (adminUser == null)
-                {
                     return new Response<RegisterResultDto>("Admin user not found to set as supervisor");
-                }
 
                 var user = new ApplicationUser
                 {
                     UserName = registerDto.UserName,
                     Email = registerDto.Email,
                     EmailConfirmed = true,
-
-                    // Personal Information
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName,
                     BirthDate = registerDto.BirthDate,
                     Address = registerDto.Address,
-
                     PhoneNumber = registerDto.Phone,
-
-                    // Professional Information
                     JobTitle = registerDto.JobTitle,
                     Department = registerDto.Department,
                     HireDate = registerDto.HireDate,
                     ContractType = registerDto.ContractType,
                     Status = registerDto.Status,
-
-                    // Set supervisor to admin user
                     SupervisorId = adminUser.Id,
                     CreatedBy = adminUser.Id,
                     UpdatedBy = adminUser.Id,
@@ -83,7 +66,6 @@ namespace Backend.Infrastructure.Repository.Command.Base
                 };
 
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
-
                 if (result.Succeeded)
                 {
                     var registerResult = new RegisterResultDto
@@ -103,7 +85,6 @@ namespace Backend.Infrastructure.Repository.Command.Base
                         Status = user.Status,
                         SupervisorId = user.SupervisorId
                     };
-
                     return new Response<RegisterResultDto>(registerResult, "User registered successfully");
                 }
 
@@ -120,45 +101,34 @@ namespace Backend.Infrastructure.Repository.Command.Base
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-            {
                 return new Response<LoginResultDto>("Invalid email or password");
-            }
 
             var passwordValid = await _userManager.CheckPasswordAsync(user, password);
             if (!passwordValid)
-            {
                 return new Response<LoginResultDto>("Invalid email or password");
-            }
 
-            List<Claim> authClaims = new List<Claim>
-    {
-        new(ClaimTypes.Email, email),
-        new Claim(ClaimTypes.NameIdentifier, user.Id),
-        new Claim(ClaimTypes.GivenName, user.FirstName),
-        new Claim(ClaimTypes.Surname, user.LastName),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
-
-            //Add Roles
-            var userRoles = await _userManager.GetRolesAsync(user);
-            foreach (var userRole in userRoles)
+            List<Claim> authClaims = new()
             {
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-            }
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.GivenName, user.FirstName),
+                new Claim(ClaimTypes.Surname, user.LastName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
-            //Add any custom claims stored with the user
+            var userRoles = await _userManager.GetRolesAsync(user);
+            authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+
             var existingClaims = await _userManager.GetClaimsAsync(user);
             foreach (var claim in existingClaims)
             {
-                // Avoid duplicates
                 if (!authClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
-                {
                     authClaims.Add(claim);
-                }
             }
 
-            var accessToken = _jwtTokenService.GenerateToken(authClaims);
-            var refreshToken = _jwtTokenService.GenerateRefreshToken();
+            // Use updated JwtTokenService methods
+            var accessToken = _jwtTokenService.GenerateAccessToken(authClaims);
+            var refreshToken = _jwtTokenService.GenerateRefreshToken(authClaims);
 
             await _context.SaveChangesAsync();
 
@@ -174,39 +144,71 @@ namespace Backend.Infrastructure.Repository.Command.Base
             return new Response<LoginResultDto>(loginResult, "Login successful");
         }
 
-        //    public virtual async Task LogoutAsync(string userId)
-        //    {
-        //        await _signInManager.SignOutAsync();
-        //    }
+        public virtual async Task<Response<string>> ChangePasswordAsync(ChangePasswordDataDto request)
+        {
+            var user = await _userManager.FindByIdAsync(request.UserId);
+            if (user == null)
+                return new Response<string>("User not found")
+                    .WithError("The specified user does not exist.");
 
-        //    public virtual Task<string> RefreshTokenAsync(string refreshToken)
-        //    {
-        //        // Placeholder: actual implementation depends on your refresh token validation logic
-        //        throw new NotImplementedException();
-        //    }
+            var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
 
-        //    public virtual async Task<bool> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
-        //    {
-        //        var user = await _userManager.FindByIdAsync(userId);
-        //        if (user == null) return false;
+            if (!result.Succeeded)
+            {
+                var response = new Response<string>("Failed to change password");
+                foreach (var error in result.Errors)
+                    response.WithError(error.Description, error.Code);
+                return response;
+            }
 
-        //        var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
-        //        return result.Succeeded;
-        //    }
+            return new Response<string>
+            {
+                Succeeded = true,
+                Message = "Password changed successfully",
+                Data = "PasswordChanged"
+            };
+        }
 
-        //    public virtual async Task<bool> ResetPasswordAsync(string email, string newPassword, string token)
-        //    {
-        //        var user = await _userManager.FindByEmailAsync(email);
-        //        if (user == null) return false;
+        public async Task<Response<LoginResultDto>> RefreshTokenAsync(string refreshToken)
+        {
+            var principal = _jwtTokenService.GetPrincipalFromExpiredToken(refreshToken);
+            if (principal == null)
+                return new Response<LoginResultDto>("Invalid refresh token")
+                    .WithError("REFRESH_TOKEN_INVALID");
 
-        //        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
-        //        return result.Succeeded;
-        //    }
+            var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return new Response<LoginResultDto>("User ID not found in token")
+                    .WithError("INVALID_CLAIMS");
 
-        //    public virtual Task<bool> RevokeTokenAsync(string userId)
-        //    {
-        //        // Placeholder: actual implementation depends on your token storage strategy
-        //        throw new NotImplementedException();
-        //    }
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return new Response<LoginResultDto>("User not found")
+                    .WithError("USER_NOT_FOUND");
+
+            var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Email, user.Email ?? ""),
+                new Claim(ClaimTypes.GivenName, user.FirstName ?? ""),
+                new Claim(ClaimTypes.Surname, user.LastName ?? ""),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var roles = await _userManager.GetRolesAsync(user);
+            authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+            var newAccessToken = _jwtTokenService.GenerateAccessToken(authClaims);
+            var newRefreshToken = _jwtTokenService.GenerateRefreshToken(authClaims);
+
+            return new Response<LoginResultDto>(new LoginResultDto
+            {
+                Token = newAccessToken,
+                RefreshToken = newRefreshToken,
+                UserId = user.Id,
+                Email = user.Email ?? "",
+                UserName = user.UserName ?? ""
+            }, "Token refreshed successfully");
+        }
     }
 }

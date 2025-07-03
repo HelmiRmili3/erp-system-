@@ -20,12 +20,11 @@ public class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceComman
     public async Task<Response<AttendanceDto>> Handle(MarkAttendanceCommand request, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrEmpty(request.UserId, nameof(request.UserId));
-        Guard.Against.Null(request.AttendanceDate, nameof(request.AttendanceDate));
-
-        var today = request.AttendanceDate.Date;
+        // AttendanceDay is DateOnly, no .Date property
+        var attendanceDay = DateOnly.FromDateTime(DateTime.Now);
 
         var existingAttendance = await _queryRepository.GetSingleByFilterAsync(
-            a => a.UserId == request.UserId && a.AttendanceDate.Date == today,
+            a => a.UserId == request.UserId && a.AttendanceDay == attendanceDay,
             null,
             cancellationToken
         );
@@ -36,14 +35,14 @@ public class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceComman
             var newAttendance = new Attendance
             {
                 UserId = request.UserId,
-                AttendanceDate = today,
-                CheckIn = request.CheckIn,
+                AttendanceDay = attendanceDay,
+                CheckIn = TimeOnly.FromDateTime(DateTime.Now),
                 CheckInMethod = request.CheckInMethod,
-                IpAddress = request.IpAddress,
-                Latitude = request.Latitude,
-                Longitude = request.Longitude,
-                DeviceId = request.DeviceId,
-                Notes = request.Notes
+                CheckInLatitude = request.CheckInLatitude,
+                CheckInLongitude = request.CheckInLongitude,
+                CheckInDeviceId = request.CheckInDeviceId,
+                CheckInIpAddress = request.CheckInIpAddress,
+                IsCheckInByAdmin = request.IsCheckInByAdmin
             };
 
             var result = await _commandRepository.AddAsync(newAttendance, cancellationToken);
@@ -56,8 +55,13 @@ public class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceComman
 
         if (existingAttendance.CheckIn == null)
         {
-            existingAttendance.CheckIn = request.CheckIn;
+            existingAttendance.CheckIn = TimeOnly.FromDateTime(DateTime.Now);
             existingAttendance.CheckInMethod = request.CheckInMethod;
+            existingAttendance.CheckInLatitude = request.CheckInLatitude;
+            existingAttendance.CheckInLongitude = request.CheckInLongitude;
+            existingAttendance.CheckInDeviceId = request.CheckInDeviceId;
+            existingAttendance.CheckInIpAddress = request.CheckInIpAddress;
+            existingAttendance.IsCheckInByAdmin = request.IsCheckInByAdmin;
 
             await _commandRepository.UpdateAsync(existingAttendance, cancellationToken);
 
@@ -66,7 +70,13 @@ public class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceComman
 
         if (existingAttendance.CheckOut == null)
         {
-            existingAttendance.CheckOut = request.CheckOut;
+            existingAttendance.CheckOut = TimeOnly.FromDateTime(DateTime.Now);
+            existingAttendance.CheckOutMethod = request.CheckOutMethod;
+            existingAttendance.CheckOutLatitude = request.CheckOutLatitude;
+            existingAttendance.CheckOutLongitude = request.CheckOutLongitude;
+            existingAttendance.CheckOutDeviceId = request.CheckOutDeviceId;
+            existingAttendance.CheckOutIpAddress = request.CheckOutIpAddress;
+            existingAttendance.IsCheckOutByAdmin = request.IsCheckOutByAdmin;
 
             await _commandRepository.UpdateAsync(existingAttendance, cancellationToken);
 

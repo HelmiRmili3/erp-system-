@@ -14,7 +14,6 @@ public static class InitialiserExtensions
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         dbContext.Database.Migrate();
-
     }
 
     public static async Task InitialiseDatabaseAsync(this WebApplication app)
@@ -24,7 +23,6 @@ public static class InitialiserExtensions
         var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
 
         await initialiser.InitialiseAsync();
-
         await initialiser.SeedAsync();
     }
 }
@@ -36,7 +34,11 @@ public class ApplicationDbContextInitialiser
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
 
-    public ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitialiser> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+    public ApplicationDbContextInitialiser(
+        ILogger<ApplicationDbContextInitialiser> logger,
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager,
+        RoleManager<ApplicationRole> roleManager)
     {
         _logger = logger;
         _context = context;
@@ -52,7 +54,7 @@ public class ApplicationDbContextInitialiser
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while initialising the database.");
+            _logger.LogError(ex, "An error occurred while initializing the database.");
             throw;
         }
     }
@@ -70,37 +72,57 @@ public class ApplicationDbContextInitialiser
         }
     }
 
-    public async Task TrySeedAsync()
+    private async Task TrySeedAsync()
     {
-        // Default roles
-        var administratorRole = new ApplicationRole(Roles.Administrator);
+        // ➤ Create default roles
+        var adminRole = new ApplicationRole(Roles.Administrator);
 
-        if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
+        if (!_roleManager.Roles.Any(r => r.Name == adminRole.Name))
         {
-            await _roleManager.CreateAsync(administratorRole);
+            await _roleManager.CreateAsync(adminRole);
         }
 
-        // Default users
-        var administrator = new ApplicationUser { UserName = "administrator@localhost", Email = "administrator@localhost" };
-
-        if (_userManager.Users.All(u => u.UserName != administrator.UserName))
+        // ➤ Create default admin user
+        var adminEmail = "administrator@localhost";
+        var adminUser = new ApplicationUser
         {
-            await _userManager.CreateAsync(administrator, "Administrator1!");
-            if (!string.IsNullOrWhiteSpace(administratorRole.Name))
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+
+        if (!_userManager.Users.Any(u => u.UserName == adminUser.UserName))
+        {
+            var result = await _userManager.CreateAsync(adminUser, "Administrator1!");
+
+            if (result.Succeeded)
             {
-                await _userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
+                await _userManager.AddToRoleAsync(adminUser, adminRole.ToString());
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    _logger.LogError("User creation error: {Error}", error.Description);
+                }
             }
         }
 
+        // ➤ Seed configuration table if empty
         if (!_context.Configurations.Any())
         {
-            _context.Configurations.Add(new Configuration("name", "Products Showcase App"));
-            _context.Configurations.Add(new Configuration("slogan", "Your slogan here"));
-            _context.Configurations.Add(new Configuration("logo", "logo.png"));
-            _context.Configurations.Add(new Configuration("phone", "+1234567890"));
-            _context.Configurations.Add(new Configuration("email", "email@example.com"));
-            _context.Configurations.Add(new Configuration("address", "123 Street, City, Country"));
-            _context.Configurations.Add(new Configuration("currency", "USD"));
+            var defaultConfigs = new[]
+            {
+                new Configuration("name", "Products Showcase App"),
+                new Configuration("slogan", "Your slogan here"),
+                new Configuration("logo", "logo.png"),
+                new Configuration("phone", "+1234567890"),
+                new Configuration("email", "email@example.com"),
+                new Configuration("address", "123 Street, City, Country"),
+                new Configuration("currency", "USD"),
+            };
+
+            _context.Configurations.AddRange(defaultConfigs);
             await _context.SaveChangesAsync();
         }
     }

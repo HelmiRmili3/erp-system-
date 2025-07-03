@@ -31,19 +31,19 @@ public class GetUserAttendancesQueryHandler : IRequestHandler<GetUserAttendances
         if (request.Day.HasValue)
         {
             var day = request.Day.Value;
-            filter = Combine(filter, a => a.AttendanceDate.Day == day);
+            filter = Combine(filter, a => a.AttendanceDay.Day == day);
         }
 
         if (request.Month.HasValue)
         {
             var month = request.Month.Value;
-            filter = Combine(filter, a => a.AttendanceDate.Month == month);
+            filter = Combine(filter, a => a.AttendanceDay.Month == month);
         }
 
         if (request.Year.HasValue)
         {
             var year = request.Year.Value;
-            filter = Combine(filter, a => a.AttendanceDate.Year == year);
+            filter = Combine(filter, a => a.AttendanceDay.Year == year);
         }
 
         var attendances = await _repository.GetAllByFilterAsync(filter, null, cancellationToken);

@@ -1,4 +1,5 @@
-﻿using Backend.Application.Features.Attendances.Commands;
+﻿using System.Security.Claims;
+using Backend.Application.Features.Attendances.Commands;
 using Backend.Application.Features.Attendances.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -95,16 +96,15 @@ public class AttendanceController : ControllerBase
     /// <returns>List of the user's attendance records.</returns>
     [Authorize]
     [HttpGet("my")]
-    public async Task<IActionResult> GetMyAttendances([FromQuery] int? month, [FromQuery] int? year)
+    public async Task<IActionResult> GetMyAttendances([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
-        // Extract user ID from token claims
-        var userId = User.FindFirst("sub")?.Value;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (string.IsNullOrEmpty(userId))
-            return Unauthorized("User ID not found in token.");
+            return Unauthorized(new { Message = "User ID not found in token." });
 
-        var result = await _sender.Send(new GetUserAttendancesQuery(userId, null, month, year));
-        _logger.LogInformation("Fetched attendance for current user {UserId} with Month: {Month}, Year: {Year}", userId, month, year);
+        var result = await _sender.Send(new GetUserAttendancesQuery(userId, day, month, year));
+        _logger.LogInformation("Fetched attendance for current user {UserId} with Day:{Day} Month: {Month}, Year: {Year}", userId, day, month, year);
         return Ok(result);
     }
 }

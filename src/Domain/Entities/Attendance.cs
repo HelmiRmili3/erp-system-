@@ -3,13 +3,24 @@
 public class Attendance : BaseAuditableEntity
 {
     public required string UserId { get; set; }
-    public DateTime AttendanceDate { get; set; }
-    public string CheckInMethod { get; set; } = null!;
-    public DateTime? CheckIn { get; set; }
-    public DateTime? CheckOut { get; set; }
-    public string? IpAddress { get; set; }
-    public double? Latitude { get; set; }
-    public double? Longitude { get; set; }
-    public string? DeviceId { get; set; }
-    public string? Notes { get; set; }
+
+    public required DateOnly AttendanceDay { get; set; }
+
+    // Check-in details
+    public TimeOnly? CheckIn { get; set; }
+    public  CheckMethod? CheckInMethod { get; set; }
+    public double? CheckInLatitude { get; set; }
+    public double? CheckInLongitude { get; set; }
+    public string? CheckInDeviceId { get; set; }
+    public string? CheckInIpAddress { get; set; }
+    public bool IsCheckInByAdmin { get; set; }
+
+    // Check-out details
+    public TimeOnly? CheckOut { get; set; }
+    public CheckMethod? CheckOutMethod { get; set; }
+    public double? CheckOutLatitude { get; set; }
+    public double? CheckOutLongitude { get; set; }
+    public string? CheckOutDeviceId { get; set; }
+    public string? CheckOutIpAddress { get; set; }
+    public bool IsCheckOutByAdmin { get; set; }
 }

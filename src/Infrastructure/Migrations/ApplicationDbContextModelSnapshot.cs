@@ -22,6 +22,63 @@ namespace Backend.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Absence", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AbsenceType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("StatusType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Absences", (string)null);
+                });
+
             modelBuilder.Entity("ApplicationRole", b =>
                 {
                     b.Property<string>("Id")
@@ -160,64 +217,7 @@ namespace Backend.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Backend.Domain.Entities.Absence", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AbsenceType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Reason")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("StatusType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Absences", (string)null);
-                });
-
-            modelBuilder.Entity("Backend.Domain.Entities.Attendance", b =>
+            modelBuilder.Entity("Attendance", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -228,49 +228,70 @@ namespace Backend.Infrastructure.Migrations
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("AttendanceDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("AttendanceDay")
+                        .HasColumnType("date");
 
-                    b.Property<DateTime?>("CheckIn")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<TimeOnly?>("CheckIn")
+                        .HasColumnType("time without time zone");
 
-                    b.Property<string>("CheckInMethod")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime?>("CheckOut")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DeviceId")
+                    b.Property<string>("CheckInDeviceId")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("IpAddress")
+                    b.Property<string>("CheckInIpAddress")
                         .HasMaxLength(45)
                         .HasColumnType("character varying(45)");
 
+                    b.Property<double?>("CheckInLatitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("CheckInLongitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<int?>("CheckInMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeOnly?>("CheckOut")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<string>("CheckOutDeviceId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CheckOutIpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("character varying(45)");
+
+                    b.Property<double?>("CheckOutLatitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("CheckOutLongitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<int?>("CheckOutMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsCheckInByAdmin")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsCheckOutByAdmin")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
-
-                    b.Property<double?>("Latitude")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("Longitude")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -285,7 +306,45 @@ namespace Backend.Infrastructure.Migrations
                     b.ToTable("Attendance", (string)null);
                 });
 
-            modelBuilder.Entity("Backend.Domain.Entities.Certification", b =>
+            modelBuilder.Entity("Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Logo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("ParentCategoryId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentCategoryId");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Certification", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -340,7 +399,43 @@ namespace Backend.Infrastructure.Migrations
                     b.ToTable("Certifications", (string)null);
                 });
 
-            modelBuilder.Entity("Backend.Domain.Entities.Contract", b =>
+            modelBuilder.Entity("Configuration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("Configurations");
+                });
+
+            modelBuilder.Entity("Contract", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -397,7 +492,7 @@ namespace Backend.Infrastructure.Migrations
                     b.ToTable("Contracts", (string)null);
                 });
 
-            modelBuilder.Entity("Backend.Domain.Entities.Employee", b =>
+            modelBuilder.Entity("Employee", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -457,7 +552,7 @@ namespace Backend.Infrastructure.Migrations
                     b.ToTable("Employees", (string)null);
                 });
 
-            modelBuilder.Entity("Backend.Domain.Entities.Expense", b =>
+            modelBuilder.Entity("Expense", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -519,143 +614,6 @@ namespace Backend.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Expenses", (string)null);
-                });
-
-            modelBuilder.Entity("Backend.Domain.Entities.Payroll", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("BaseSalary")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<decimal>("Bonuses")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("Deductions")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("FileUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<bool>("IsViewedByEmployee")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("NetSalary")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("Period")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Payrolls", (string)null);
-                });
-
-            modelBuilder.Entity("Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Logo")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int?>("ParentCategoryId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentCategoryId");
-
-                    b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("Configuration", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Key")
-                        .IsUnique();
-
-                    b.ToTable("Configurations");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -764,16 +722,70 @@ namespace Backend.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ApplicationUser", b =>
+            modelBuilder.Entity("Payroll", b =>
                 {
-                    b.HasOne("ApplicationUser", "Supervisor")
-                        .WithMany("Subordinates")
-                        .HasForeignKey("SupervisorId");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.Navigation("Supervisor");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("BaseSalary")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<decimal>("Bonuses")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Deductions")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<string>("FileUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsViewedByEmployee")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("NetSalary")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<string>("Period")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Payrolls", (string)null);
                 });
 
-            modelBuilder.Entity("Backend.Domain.Entities.Absence", b =>
+            modelBuilder.Entity("Absence", b =>
                 {
                     b.HasOne("ApplicationUser", null)
                         .WithMany("Absences")
@@ -786,62 +798,19 @@ namespace Backend.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Backend.Domain.Entities.Attendance", b =>
+            modelBuilder.Entity("ApplicationUser", b =>
+                {
+                    b.HasOne("ApplicationUser", "Supervisor")
+                        .WithMany("Subordinates")
+                        .HasForeignKey("SupervisorId");
+
+                    b.Navigation("Supervisor");
+                });
+
+            modelBuilder.Entity("Attendance", b =>
                 {
                     b.HasOne("ApplicationUser", null)
                         .WithMany("Attendances")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Backend.Domain.Entities.Certification", b =>
-                {
-                    b.HasOne("ApplicationUser", null)
-                        .WithMany("Certifications")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Backend.Domain.Entities.Contract", b =>
-                {
-                    b.HasOne("ApplicationUser", null)
-                        .WithMany("Contracts")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Backend.Domain.Entities.Expense", b =>
-                {
-                    b.HasOne("ApplicationUser", null)
-                        .WithMany("Expenses")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Backend.Domain.Entities.Payroll", b =>
-                {
-                    b.HasOne("ApplicationUser", null)
-                        .WithMany("Payrolls")
                         .HasForeignKey("ApplicationUserId");
 
                     b.HasOne("ApplicationUser", null)
@@ -859,6 +828,45 @@ namespace Backend.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("Certification", b =>
+                {
+                    b.HasOne("ApplicationUser", null)
+                        .WithMany("Certifications")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Contract", b =>
+                {
+                    b.HasOne("ApplicationUser", null)
+                        .WithMany("Contracts")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Expense", b =>
+                {
+                    b.HasOne("ApplicationUser", null)
+                        .WithMany("Expenses")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -905,6 +913,19 @@ namespace Backend.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
+                    b.HasOne("ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Payroll", b =>
+                {
+                    b.HasOne("ApplicationUser", null)
+                        .WithMany("Payrolls")
+                        .HasForeignKey("ApplicationUserId");
+
                     b.HasOne("ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")

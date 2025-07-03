@@ -4,7 +4,6 @@ using Backend.Application.Features.Attendances.Dto;
 
 using System.Linq.Expressions;
 
-
 /// <summary>
 /// Query to get all attendances, optionally filtered by day/month/year.
 /// </summary>
@@ -24,25 +23,24 @@ public class GetAllAttendancesQueryHandler : IRequestHandler<GetAllAttendancesQu
 
     public async Task<Response<List<AttendanceDto>>> Handle(GetAllAttendancesQuery request, CancellationToken cancellationToken)
     {
-        // Base expression: match all
         Expression<Func<Attendance, bool>> filter = a => true;
 
         if (request.Day.HasValue)
         {
             var day = request.Day.Value;
-            filter = Combine(filter, a => a.AttendanceDate.Day == day);
+            filter = Combine(filter, a => a.AttendanceDay.Day == day);
         }
 
         if (request.Month.HasValue)
         {
             var month = request.Month.Value;
-            filter = Combine(filter, a => a.AttendanceDate.Month == month);
+            filter = Combine(filter, a => a.AttendanceDay.Month == month);
         }
 
         if (request.Year.HasValue)
         {
             var year = request.Year.Value;
-            filter = Combine(filter, a => a.AttendanceDate.Year == year);
+            filter = Combine(filter, a => a.AttendanceDay.Year == year);
         }
 
         var attendances = await _repository.GetAllByFilterAsync(filter, null, cancellationToken);
