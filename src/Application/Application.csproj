@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Payroll\Commands\" />
-    <Folder Include="Features\Payroll\Dto\" />
-    <Folder Include="Features\Payroll\IRepositories\" />
-    <Folder Include="Features\Payroll\Queries\" />
     <Folder Include="Features\User\Commands\" />
     <Folder Include="Features\User\IRepositories\" />
     <Folder Include="Features\User\Dto\" />

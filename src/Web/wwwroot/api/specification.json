@@ -1708,6 +1708,279 @@
           }
         ]
       }
+    },
+    "/api/Payroll": {
+      "post": {
+        "tags": [
+          "Payroll"
+        ],
+        "operationId": "Payroll_CreatePayroll",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePayrollCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Payroll"
+        ],
+        "operationId": "Payroll_UpdatePayroll",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePayrollCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Payroll/{id}": {
+      "delete": {
+        "tags": [
+          "Payroll"
+        ],
+        "operationId": "Payroll_DeletePayroll",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Payroll"
+        ],
+        "operationId": "Payroll_GetPayrollById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Payroll/all": {
+      "get": {
+        "tags": [
+          "Payroll"
+        ],
+        "operationId": "Payroll_GetAllPayrolls",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "day",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Payroll/my": {
+      "get": {
+        "tags": [
+          "Payroll"
+        ],
+        "operationId": "Payroll_GetMyPayrolls",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -2329,6 +2602,76 @@
         "allOf": [
           {
             "$ref": "#/components/schemas/ExpenseAddDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "CreatePayrollCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "payroll": {
+            "$ref": "#/components/schemas/PayrollAddDto"
+          }
+        }
+      },
+      "PayrollAddDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "period": {
+            "type": "string"
+          },
+          "baseSalary": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "bonuses": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "deductions": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "netSalary": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "fileUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "isViewedByEmployee": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdatePayrollCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "payroll": {
+            "$ref": "#/components/schemas/PayrollUpdateDto"
+          }
+        }
+      },
+      "PayrollUpdateDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PayrollAddDto"
           },
           {
             "type": "object",

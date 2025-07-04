@@ -28,6 +28,7 @@ using Backend.Application.Features.Absences.IRepositories;
 using Backend.Application.Features.Certifications.IRepositories;
 using Backend.Application.Features.Contracts.IRepositories;
 using Backend.Application.Features.Expenses.IRepositories;
+using Backend.Application.Features.Payrolls.IRepositories;
 
 namespace Backend.Infrastructure;
 
@@ -155,7 +156,8 @@ public static class DependencyInjection
         builder.Services.AddTransient<IExpenseCommandRepository, ExpenseCommandRepository>();
         builder.Services.AddTransient<IExpenseQueryRepository, ExpenseQueryRepository>();
         // Payroll
-
+        builder.Services.AddTransient<IPayrollCommandRepository, PayrollCommandRepository>();
+        builder.Services.AddTransient<IPayrollQueryRepository, PayrollQueryRepository>();
 
         builder.Services.AddAuthorization(options =>
             options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
