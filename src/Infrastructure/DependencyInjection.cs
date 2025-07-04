@@ -27,6 +27,8 @@ using Microsoft.AspNetCore.Http;
 using Backend.Application.Features.Admin.IRepositories;
 using Backend.Application.Features.Absences.IRepositories;
 using Backend.Application.Features.Certifications.IRepositories;
+using Backend.Application.Features.Contracts.IRepositories;
+using Backend.Application.Features.Expenses.IRepositories;
 
 namespace Backend.Infrastructure;
 
@@ -150,7 +152,13 @@ public static class DependencyInjection
         // Certification
         builder.Services.AddTransient<ICertificationCommandRepository, CertificationCommandRepository>();
         builder.Services.AddTransient<ICertificationQueryRepository, CertifiactionQueryRepository>();
-
+        // Contract 
+        builder.Services.AddTransient<IContractCommandRepository, ContractCommandRepository>();
+        builder.Services.AddTransient<IContractQueryRepository, ContractQueryRepository>();
+        // Expenses
+        builder.Services.AddTransient<IExpenseCommandRepository, ExpenseCommandRepository>();
+        builder.Services.AddTransient<IExpenseQueryRepository, ExpenseQueryRepository>();
+        // Payroll
 
 
         builder.Services.AddAuthorization(options =>
