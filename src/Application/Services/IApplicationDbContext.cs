@@ -4,9 +4,6 @@ namespace Backend.Application.Services;
 
 public interface IApplicationDbContext
 {
-    //DbSet<Category> Categories { get; }
-    //DbSet<Configuration> Configurations { get; }
-    DbSet<Employee> Employees { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 

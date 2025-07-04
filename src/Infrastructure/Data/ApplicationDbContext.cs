@@ -10,7 +10,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<Category> Categories { get; set; }
     public DbSet<Configuration> Configurations { get; set; }
-    public DbSet<Employee> Employees { get; set; }
     public DbSet<Absence> Absences { get; set; }
     public DbSet<Attendance> Attendances { get; set; }
     public DbSet<Contract> Contracts { get; set; }

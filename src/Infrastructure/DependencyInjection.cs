@@ -16,7 +16,6 @@ using Backend.Infrastructure.Repository.Query;
 using Backend.Infrastructure.Repository.Command;
 using Microsoft.Extensions.DependencyInjection;
 using Backend.Application.Features.Configurations.IRepositories;
-using Backend.Application.Features.Employees.IRepositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
@@ -137,9 +136,6 @@ public static class DependencyInjection
         // Configuration
         builder.Services.AddTransient<IConfigurationQueryRepository, ConfigurationQueryRepository>();
         builder.Services.AddTransient<IConfigurationCommandRepository, ConfigurationCommandRepository>();
-        // Employee
-        builder.Services.AddTransient<IEmployeeCommandRepository, EmployeeCommandRepository>();
-        builder.Services.AddTransient<IEmployeeQueryRepository, EmployeeQueryRepository>();
         //Authentication
         builder.Services.AddTransient<IAuthenticationCommandRepository, AuthenticationCommandRepository>();
         builder.Services.AddScoped<IAuthenticationQueryRepository, AuthenticationQueryRepository>();
