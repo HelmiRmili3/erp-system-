@@ -26,6 +26,7 @@ using Backend.Application.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Backend.Application.Features.Admin.IRepositories;
 using Backend.Application.Features.Absences.IRepositories;
+using Backend.Application.Features.Certifications.IRepositories;
 
 namespace Backend.Infrastructure;
 
@@ -141,14 +142,14 @@ public static class DependencyInjection
         builder.Services.AddTransient<IAuthenticationCommandRepository, AuthenticationCommandRepository>();
         builder.Services.AddScoped<IAuthenticationQueryRepository, AuthenticationQueryRepository>();
         // Absence
-
         builder.Services.AddTransient<IAbsenceCommandRepository, AbsenceCommandRepository>();
         builder.Services.AddTransient<IAbsenceQueryRepository, AbsenceQueryRepository>();
         // Attendance 
-
         builder.Services.AddTransient<IAttendanceCommandRepository, AttendanceCommandRepository>();
         builder.Services.AddTransient<IAttendanceQueryRepository, AttendanceQueryRepository>();
-
+        // Certification
+        builder.Services.AddTransient<ICertificationCommandRepository, CertificationCommandRepository>();
+        builder.Services.AddTransient<ICertificationQueryRepository, CertifiactionQueryRepository>();
 
 
 
