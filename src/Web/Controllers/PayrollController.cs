@@ -26,12 +26,14 @@ public class PayrollController : ControllerBase
     /// Create a new payroll record.
     /// </summary>
     [HttpPost]
-    public async Task<IActionResult> CreatePayroll([FromBody] CreatePayrollCommand command)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreatePayroll([FromForm] CreatePayrollCommand command)
     {
         var result = await _sender.Send(command);
         _logger.LogInformation("Created payroll: {@Result}", result);
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
+
 
     /// <summary>
     /// Update an existing payroll.

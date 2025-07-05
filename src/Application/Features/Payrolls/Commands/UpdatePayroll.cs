@@ -41,7 +41,6 @@ public class UpdatePayrollCommandHandler : IRequestHandler<UpdatePayrollCommand,
         entity.Bonuses = dto.Bonuses;
         entity.Deductions = dto.Deductions;
         entity.NetSalary = dto.NetSalary;
-        entity.FileUrl = dto.FileUrl;
         entity.IsViewedByEmployee = dto.IsViewedByEmployee;
 
         await _commandRepository.UpdateAsync(entity, cancellationToken);

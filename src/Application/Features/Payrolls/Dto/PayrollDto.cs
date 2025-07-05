@@ -41,7 +41,6 @@
         public decimal Bonuses { get; init; }
         public decimal Deductions { get; init; }
         public decimal NetSalary { get; init; }
-        public string? FileUrl { get; init; }
         public bool IsViewedByEmployee { get; init; } = false;
     }
 

@@ -4,26 +4,40 @@ using Backend.Application.Features.Payrolls.Dtos;
 using Backend.Domain.Entities;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Backend.Application.Features.Payrolls.Commands;
 
 /// <summary>
-/// Command to create a new payroll record.
+/// Command to create a new payroll record with optional file upload.
 /// </summary>
-public record CreatePayrollCommand(PayrollAddDto Payroll) : IRequest<Response<int>>;
+public record CreatePayrollCommand(PayrollAddDto Payroll, IFormFile? File) : IRequest<Response<int>>;
 
+/// <summary>
+/// Handles the creation of a new payroll.
+/// </summary>
 public class CreatePayrollCommandHandler : IRequestHandler<CreatePayrollCommand, Response<int>>
 {
     private readonly ICommandRepository<Payroll> _repository;
+    private readonly IFileService _fileService;
 
-    public CreatePayrollCommandHandler(ICommandRepository<Payroll> repository)
+    public CreatePayrollCommandHandler(ICommandRepository<Payroll> repository, IFileService fileService)
     {
         _repository = repository;
+        _fileService = fileService;
     }
 
     public async Task<Response<int>> Handle(CreatePayrollCommand request, CancellationToken cancellationToken)
     {
         var dto = request.Payroll;
+
+        string? fileUrl = null;
+        if (request.File is { Length: > 0 })
+        {
+            var fileName = $"{Guid.NewGuid()}";
+            var relativePath = await _fileService.SaveFileAsync(request.File, fileName, "payrolls");
+            fileUrl = $"/files/{relativePath.Replace("\\", "/")}";
+        }
 
         var entity = new Payroll
         {
@@ -33,7 +47,7 @@ public class CreatePayrollCommandHandler : IRequestHandler<CreatePayrollCommand,
             Bonuses = dto.Bonuses,
             Deductions = dto.Deductions,
             NetSalary = dto.NetSalary,
-            FileUrl = dto.FileUrl,
+            FileUrl = fileUrl,
             IsViewedByEmployee = dto.IsViewedByEmployee
         };
 
@@ -42,6 +56,9 @@ public class CreatePayrollCommandHandler : IRequestHandler<CreatePayrollCommand,
     }
 }
 
+/// <summary>
+/// Validator for the CreatePayrollCommand.
+/// </summary>
 public class CreatePayrollCommandValidator : AbstractValidator<CreatePayrollCommand>
 {
     public CreatePayrollCommandValidator()
@@ -56,7 +73,25 @@ public class CreatePayrollCommandValidator : AbstractValidator<CreatePayrollComm
         RuleFor(x => x.Payroll.BaseSalary)
             .GreaterThanOrEqualTo(0).WithMessage("Base salary must be non-negative.");
 
+        RuleFor(x => x.Payroll.Bonuses)
+            .GreaterThanOrEqualTo(0).WithMessage("Bonuses must be non-negative.");
+
+        RuleFor(x => x.Payroll.Deductions)
+            .GreaterThanOrEqualTo(0).WithMessage("Deductions must be non-negative.");
+
         RuleFor(x => x.Payroll.NetSalary)
             .GreaterThanOrEqualTo(0).WithMessage("Net salary must be non-negative.");
+
+        // Optional: Validate file size and type
+        When(x => x.File != null, () =>
+        {
+            RuleFor(x => x.File!.Length)
+                .LessThanOrEqualTo(5 * 1024 * 1024) // Max 5MB
+                .WithMessage("File must be less than or equal to 5MB.");
+
+            RuleFor(x => x.File!.ContentType)
+                .Equal("application/pdf")
+                .WithMessage("Only PDF files are allowed.");
+        });
     }
 }
