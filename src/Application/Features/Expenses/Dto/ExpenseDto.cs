@@ -20,17 +20,17 @@ namespace Backend.Application.Features.Expenses.Dtos
 
     public record ExpenseAddDto
     {
-        public required string UserId { get; init; }
         public string Description { get; init; } = string.Empty;
         public decimal Amount { get; init; }
         public DateTime ExpenseDate { get; init; }
         public string Category { get; init; } = string.Empty;
-        public ExpenseStatus Status { get; init; } = ExpenseStatus.Pending;
-        public string ReceiptPath { get; init; } = string.Empty;
     }
 
     public record ExpenseUpdateDto : ExpenseAddDto
     {
         public int Id { get; init; }
+        public ExpenseStatus Status { get; set; } = ExpenseStatus.Pending;
+        public string ReceiptPath { get; set; } = string.Empty;
     }
 }
+

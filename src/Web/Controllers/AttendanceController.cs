@@ -27,7 +27,7 @@ public class AttendanceController : ControllerBase
     /// </summary>
     /// <param name="command">The attendance data including user ID, date, and check-in or check-out time.</param>
     /// <returns>A success or error response depending on the state of the attendance record.</returns>
-    [Authorize]
+    [Authorize(Roles = "Employee")]
     [HttpPost("mark")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -43,7 +43,7 @@ public class AttendanceController : ControllerBase
     /// </summary>
     /// <param name="id">The ID of the attendance record.</param>
     /// <returns>Confirmation of deletion.</returns>
-    [Authorize]
+    [Authorize(Roles = "Administrator")]
     [HttpDelete("{id}")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -65,6 +65,8 @@ public class AttendanceController : ControllerBase
     /// <returns>List of attendance records.</returns>
     [HttpGet("user/{userId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> GetUserAttendances(string userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var result = await _sender.Send(new GetUserAttendancesQuery(userId, day, month, year));
@@ -81,6 +83,8 @@ public class AttendanceController : ControllerBase
     /// <returns>List of all attendance records.</returns>
     [HttpGet("all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> GetAllAttendances([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var result = await _sender.Send(new GetAllAttendancesQuery(day, month, year));
@@ -96,6 +100,8 @@ public class AttendanceController : ControllerBase
     /// <returns>List of the user's attendance records.</returns>
     [Authorize]
     [HttpGet("my")]
+    [Authorize(Roles = "Employee")]
+
     public async Task<IActionResult> GetMyAttendances([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

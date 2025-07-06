@@ -24,7 +24,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -58,7 +65,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       }
@@ -93,7 +102,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -139,7 +153,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       },
@@ -177,7 +193,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       }
@@ -225,7 +243,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       }
@@ -656,7 +676,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       }
@@ -696,7 +718,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       }
@@ -752,7 +776,14 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       }
     },
     "/api/Attendance/all": {
@@ -797,7 +828,14 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       }
     },
     "/api/Attendance/my": {
@@ -853,7 +891,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       }
@@ -925,7 +965,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       }
     },
     "/api/Auth/refresh": {
@@ -1060,7 +1107,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       },
@@ -1088,7 +1137,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       }
@@ -1118,7 +1169,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       },
@@ -1205,7 +1258,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       }
@@ -1255,7 +1310,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       }
@@ -1284,7 +1341,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       }
@@ -1324,7 +1383,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       },
@@ -1352,7 +1413,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       }
@@ -1382,7 +1445,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       },
@@ -1469,7 +1534,61 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/Contract/my": {
+      "get": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "Contract_GetMyContracts",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       }
@@ -1481,16 +1600,36 @@
         ],
         "operationId": "Expense_CreateExpense",
         "requestBody": {
-          "x-name": "command",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/CreateExpenseCommand"
+                "type": "object",
+                "properties": {
+                  "Expense.Description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Expense.Amount": {
+                    "type": "number",
+                    "format": "decimal"
+                  },
+                  "Expense.ExpenseDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "Expense.Category": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary",
+                    "nullable": true
+                  }
+                }
               }
             }
-          },
-          "required": true,
-          "x-position": 1
+          }
         },
         "responses": {
           "200": {
@@ -1509,7 +1648,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       },
@@ -1537,7 +1678,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       }
@@ -1567,7 +1710,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       },
@@ -1595,7 +1740,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       }
@@ -1654,7 +1801,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       }
@@ -1704,7 +1853,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       }
@@ -1773,7 +1924,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       },
@@ -1809,7 +1962,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       }
@@ -1847,7 +2002,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       },
@@ -1905,7 +2062,7 @@
             "x-position": 1
           },
           {
-            "name": "day",
+            "name": "month",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1915,16 +2072,6 @@
             "x-position": 2
           },
           {
-            "name": "month",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 3
-          },
-          {
             "name": "year",
             "in": "query",
             "schema": {
@@ -1932,7 +2079,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 4
+            "x-position": 3
           }
         ],
         "responses": {
@@ -1950,7 +2097,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       }
@@ -1963,7 +2112,7 @@
         "operationId": "Payroll_GetMyPayrolls",
         "parameters": [
           {
-            "name": "day",
+            "name": "month",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1973,16 +2122,6 @@
             "x-position": 1
           },
           {
-            "name": "month",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
             "name": "year",
             "in": "query",
             "schema": {
@@ -1990,7 +2129,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 3
+            "x-position": 2
           }
         ],
         "responses": {
@@ -2008,7 +2147,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Employee"
+            ]
           }
         ]
       }
@@ -2568,58 +2709,6 @@
           }
         ]
       },
-      "CreateExpenseCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "expense": {
-            "$ref": "#/components/schemas/ExpenseAddDto"
-          }
-        }
-      },
-      "ExpenseAddDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "userId": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "expenseDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "category": {
-            "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/ExpenseStatus"
-          },
-          "receiptPath": {
-            "type": "string"
-          }
-        }
-      },
-      "ExpenseStatus": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Pending",
-          "Approved",
-          "Rejected"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
-      },
       "UpdateExpenseCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -2641,10 +2730,50 @@
               "id": {
                 "type": "integer",
                 "format": "int32"
+              },
+              "status": {
+                "$ref": "#/components/schemas/ExpenseStatus"
+              },
+              "receiptPath": {
+                "type": "string"
               }
             }
           }
         ]
+      },
+      "ExpenseStatus": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Pending",
+          "Approved",
+          "Rejected"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "ExpenseAddDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "expenseDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "category": {
+            "type": "string"
+          }
+        }
       },
       "UpdatePayrollCommand": {
         "type": "object",

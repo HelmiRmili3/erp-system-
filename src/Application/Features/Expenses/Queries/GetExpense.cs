@@ -37,7 +37,6 @@ public class GetExpenseQueryHandler : IRequestHandler<GetExpenseByIdQuery, Respo
             ExpenseDate = entity.ExpenseDate,
             Category = entity.Category,
             Status = entity.Status,
-            ReceiptPath = entity.ReceiptPath
         };
 
         return new Response<ExpenseDto>(dto, "Expense retrieved successfully.");

@@ -33,7 +33,6 @@ public class UpdateExpenseCommandHandler : IRequestHandler<UpdateExpenseCommand,
                 .WithError("The specified expense record does not exist.");
         }
 
-        entity.UserId = dto.UserId;
         entity.Description = dto.Description;
         entity.Amount = dto.Amount;
         entity.ExpenseDate = dto.ExpenseDate.ToUniversalTime();
@@ -53,9 +52,6 @@ public class UpdateExpenseCommandValidator : AbstractValidator<UpdateExpenseComm
     {
         RuleFor(x => x.Expense.Id)
             .GreaterThan(0).WithMessage("Expense ID must be greater than 0.");
-
-        RuleFor(x => x.Expense.UserId)
-            .NotEmpty().WithMessage("UserId is required.");
 
         RuleFor(x => x.Expense.Amount)
             .GreaterThan(0).WithMessage("Amount must be greater than zero.");

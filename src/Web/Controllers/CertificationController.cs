@@ -13,7 +13,6 @@ namespace Backend.Web.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class CertificationController : ControllerBase
 {
     private readonly ISender _sender;
@@ -32,6 +31,8 @@ public class CertificationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> CreateCertification([FromBody] CreateCertificationCommand command)
     {
         var result = await _sender.Send(command);
@@ -45,6 +46,8 @@ public class CertificationController : ControllerBase
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> UpdateCertification([FromBody] UpdateCertificationCommand command)
     {
         var result = await _sender.Send(command);
@@ -58,6 +61,8 @@ public class CertificationController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> DeleteCertification(int id)
     {
         var result = await _sender.Send(new DeleteCertificationCommand(id));
@@ -71,6 +76,8 @@ public class CertificationController : ControllerBase
     [HttpGet("all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> GetAllCertifications([FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var result = await _sender.Send(new GetAllCertificationsQuery(userId, day, month, year));
@@ -84,6 +91,8 @@ public class CertificationController : ControllerBase
     [HttpGet("my")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Employee")]
+
     public async Task<IActionResult> GetMyCertifications([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -101,6 +110,8 @@ public class CertificationController : ControllerBase
     [HttpGet("user/{userId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> GetUserCertifications(string userId)
     {
         var result = await _sender.Send(new GetCertificationsByUserIdQuery(userId));
@@ -114,6 +125,8 @@ public class CertificationController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize]
+
     public async Task<IActionResult> GetCertificationById(int id)
     {
         var result = await _sender.Send(new GetCertificationByIdQuery(id));

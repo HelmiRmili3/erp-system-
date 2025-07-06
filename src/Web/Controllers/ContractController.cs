@@ -12,7 +12,6 @@ namespace Backend.Web.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class ContractController : ControllerBase
 {
     private readonly ISender _sender;
@@ -31,6 +30,9 @@ public class ContractController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
+
     public async Task<IActionResult> CreateContract([FromBody] CreateContractCommand command)
     {
         var result = await _sender.Send(command);
@@ -44,6 +46,8 @@ public class ContractController : ControllerBase
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> UpdateContract([FromBody] UpdateContractCommand command)
     {
         var result = await _sender.Send(command);
@@ -57,6 +61,8 @@ public class ContractController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> DeleteContract(int id)
     {
         var result = await _sender.Send(new DeleteContractCommand(id));
@@ -70,6 +76,8 @@ public class ContractController : ControllerBase
     [HttpGet("all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> GetAllContracts([FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var result = await _sender.Send(new GetAllContractsQuery(userId, day, month, year));
@@ -77,22 +85,24 @@ public class ContractController : ControllerBase
         return Ok(result);
     }
 
-    ///// <summary>
-    ///// Get contracts for the currently logged-in user.
-    ///// </summary>
-    //[HttpGet("my")]
-    //[ProducesResponseType(StatusCodes.Status200OK)]
-    //[Produces("application/json")]
-    //public async Task<IActionResult> GetMyContracts([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
-    //{
-    //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    //    if (string.IsNullOrEmpty(userId))
-    //        return Unauthorized(new { Message = "User ID not found in token." });
+    /// <summary>
+    /// Get contracts for the currently logged-in user.
+    /// </summary>
+    [HttpGet("my")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Produces("application/json")]
+    [Authorize(Roles = "Employee")]
 
-    //    var result = await _sender.Send(new GetContractsByUserIdQuery(userId));
-    //    _logger.LogInformation("Fetched contracts for current user {UserId}", userId);
-    //    return Ok(result);
-    //}
+    public async Task<IActionResult> GetMyContracts([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(new { Message = "User ID not found in token." });
+
+        var result = await _sender.Send(new GetAllContractsQuery(userId, day, month, year));
+        _logger.LogInformation("Fetched contracts for current user {UserId}", userId);
+        return Ok(result);
+    }
 
     ///// <summary>
     ///// Get all contracts for a specific user.
@@ -113,6 +123,8 @@ public class ContractController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize]
+
     public async Task<IActionResult> GetContractById(int id)
     {
         var result = await _sender.Send(new GetContractByIdQuery(id));

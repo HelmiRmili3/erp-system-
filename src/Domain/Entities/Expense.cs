@@ -9,5 +9,5 @@ public class Expense : BaseAuditableEntity
     public DateTime ExpenseDate { get; set; }
     public string Category { get; set; } = string.Empty;
     public ExpenseStatus Status { get; set; } = ExpenseStatus.Pending; // Pending, Approved, Rejected
-    public string ReceiptPath { get; set; } = string.Empty;
+    public string? ReceiptPath { get; set; }
 }

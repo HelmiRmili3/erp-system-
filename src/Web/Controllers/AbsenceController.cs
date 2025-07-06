@@ -20,6 +20,8 @@ public class AbsenceController : ControllerBase
 
     // GET: api/absence
     [HttpGet]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> GetAbsences()
     {
         var result = await _sender.Send(new GetAbsencesQuery());
@@ -29,6 +31,8 @@ public class AbsenceController : ControllerBase
 
     // GET: api/absence/{id}
     [HttpGet("{id}", Name = "GetAbsence")]
+    [Authorize]
+
     public async Task<IActionResult> GetAbsence(int id)
     {
         var result = await _sender.Send(new GetAbsenceQuery(id));
@@ -37,7 +41,7 @@ public class AbsenceController : ControllerBase
     }
 
     // POST: api/absence
-    [Authorize]
+    [Authorize(Roles = "Employee")]
     [HttpPost]
     public async Task<IActionResult> CreateAbsence([FromBody] CreateAbsenceCommand command)
     {
@@ -45,9 +49,8 @@ public class AbsenceController : ControllerBase
         _logger.LogInformation("Created absence with response: {@Response}", response);
         return CreatedAtRoute("GetAbsence", new { id = response }, response);
     }
-
     // PUT: api/absence/{id}
-    [Authorize]
+    [Authorize(Roles = "Administrator")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAbsence(int id, [FromBody] UpdateAbsenceCommand command)
     {
@@ -62,7 +65,7 @@ public class AbsenceController : ControllerBase
     }
 
     // DELETE: api/absence/{id}
-    [Authorize]
+    [Authorize(Roles = "Employee")]
     [HttpDelete("{id}")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -74,7 +77,7 @@ public class AbsenceController : ControllerBase
         return Ok(result);
     }
     // GET: api/absence/my
-    [Authorize]
+    [Authorize(Roles = "Employee")]
     [HttpGet("my")]
     public async Task<IActionResult> GetMyAbsences([FromQuery] int? month, [FromQuery] int? year)
     {

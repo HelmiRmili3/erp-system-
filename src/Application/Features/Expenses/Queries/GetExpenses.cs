@@ -62,7 +62,6 @@ namespace Backend.Application.Features.Expenses.Queries
                 ExpenseDate = e.ExpenseDate,
                 Category = e.Category,
                 Status = e.Status,
-                ReceiptPath = e.ReceiptPath
             }).ToList();
 
             return new Response<List<ExpenseDto>>(dtos, "Expenses retrieved successfully.");

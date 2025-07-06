@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Backend.Application.Features.Expenses.Commands;
+using Backend.Application.Features.Expenses.Dtos;
 using Backend.Application.Features.Expenses.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +14,6 @@ namespace Backend.Web.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class ExpenseController : ControllerBase
 {
     private readonly ISender _sender;
@@ -29,15 +29,18 @@ public class ExpenseController : ControllerBase
     /// Create a new expense.
     /// </summary>
     [HttpPost]
+    [Authorize(Roles ="Employee")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Produces("application/json")]
-    public async Task<IActionResult> CreateExpense([FromBody] CreateExpenseCommand command)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateExpense([FromForm] CreateExpenseCommand command)
     {
         var result = await _sender.Send(command);
         _logger.LogInformation("Created expense: {@Result}", result);
+
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
+
 
     /// <summary>
     /// Update an existing expense.
@@ -45,6 +48,8 @@ public class ExpenseController : ControllerBase
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Employee")]
+
     public async Task<IActionResult> UpdateExpense([FromBody] UpdateExpenseCommand command)
     {
         var result = await _sender.Send(command);
@@ -58,6 +63,8 @@ public class ExpenseController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Employee")]
+
     public async Task<IActionResult> DeleteExpense(int id)
     {
         var result = await _sender.Send(new DeleteExpenseCommand(id));
@@ -71,6 +78,8 @@ public class ExpenseController : ControllerBase
     [HttpGet("all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> GetAllExpenses([FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var result = await _sender.Send(new GetAllExpensesQuery(userId, day, month, year));
@@ -84,6 +93,8 @@ public class ExpenseController : ControllerBase
     [HttpGet("my")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Employee")]
+
     public async Task<IActionResult> GetMyExpenses([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -101,6 +112,8 @@ public class ExpenseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
+
     public async Task<IActionResult> GetExpenseById(int id)
     {
         var result = await _sender.Send(new GetExpenseByIdQuery(id));

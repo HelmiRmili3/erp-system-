@@ -4,8 +4,6 @@ using Backend.Application.Features.Authentication.Dto;
 using Backend.Application.Features.Authentication.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-
 
 namespace Backend.Web.Controllers;
 
@@ -33,6 +31,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("register")]
     [Produces("application/json")]
+    [Authorize(Roles = "Administrator")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
