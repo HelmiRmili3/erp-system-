@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Web.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class AbsenceController : ControllerBase
 {
     private readonly ISender _sender;
@@ -78,7 +78,7 @@ public class AbsenceController : ControllerBase
     }
     // GET: api/absence/my
     [Authorize(Roles = "Employee")]
-    [HttpGet("my")]
+    [HttpGet("me")]
     public async Task<IActionResult> GetMyAbsences([FromQuery] int? month, [FromQuery] int? year)
     {
         var query = new GetEmployeeAbsencesByIdQuery(month, year);

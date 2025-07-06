@@ -77,7 +77,7 @@ public class AuthController : ControllerBase
 
     }
 
-    [HttpGet("current-user")]
+    [HttpGet("me")]
     [Authorize]
     public async Task<IActionResult> Me()
     {

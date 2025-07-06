@@ -13,7 +13,7 @@ namespace Backend.Web.Controllers;
 /// Handles operations related to employee expenses.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class ExpenseController : ControllerBase
 {
     private readonly ISender _sender;
@@ -75,7 +75,7 @@ public class ExpenseController : ControllerBase
     /// <summary>
     /// Get all expenses with optional filters.
     /// </summary>
-    [HttpGet("all")]
+    [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
     [Authorize(Roles = "Administrator")]
@@ -90,7 +90,7 @@ public class ExpenseController : ControllerBase
     /// <summary>
     /// Get expenses for the currently authenticated user.
     /// </summary>
-    [HttpGet("my")]
+    [HttpGet("me")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
     [Authorize(Roles = "Employee")]

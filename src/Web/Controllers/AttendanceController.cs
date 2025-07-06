@@ -10,7 +10,7 @@ namespace Backend.Web.Controllers;
 /// Handles attendance operations such as check-in, check-out, and retrieval.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class AttendanceController : ControllerBase
 {
     private readonly ISender _sender;
@@ -55,24 +55,24 @@ public class AttendanceController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Get all attendance records for a specific user with optional filters.
-    /// </summary>
-    /// <param name="userId">User ID to filter records.</param>
-    /// <param name="day">Optional day filter.</param>
-    /// <param name="month">Optional month filter.</param>
-    /// <param name="year">Optional year filter.</param>
-    /// <returns>List of attendance records.</returns>
-    [HttpGet("user/{userId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(Roles = "Administrator")]
+    ///// <summary>
+    ///// Get all attendance records for a specific user with optional filters.
+    ///// </summary>
+    ///// <param name="userId">User ID to filter records.</param>
+    ///// <param name="day">Optional day filter.</param>
+    ///// <param name="month">Optional month filter.</param>
+    ///// <param name="year">Optional year filter.</param>
+    ///// <returns>List of attendance records.</returns>
+    //[HttpGet("user/{userId}")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[Authorize(Roles = "Administrator")]
 
-    public async Task<IActionResult> GetUserAttendances(string userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
-    {
-        var result = await _sender.Send(new GetUserAttendancesQuery(userId, day, month, year));
-        _logger.LogInformation("Fetched attendance for user {UserId} with filters - Day: {Day}, Month: {Month}, Year: {Year}", userId, day, month, year);
-        return Ok(result);
-    }
+    //public async Task<IActionResult> GetUserAttendances(string userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
+    //{
+    //    var result = await _sender.Send(new GetUserAttendancesQuery(userId, day, month, year));
+    //    _logger.LogInformation("Fetched attendance for user {UserId} with filters - Day: {Day}, Month: {Month}, Year: {Year}", userId, day, month, year);
+    //    return Ok(result);
+    //}
 
     /// <summary>
     /// Get all attendance records for all users with optional filters.
@@ -81,14 +81,14 @@ public class AttendanceController : ControllerBase
     /// <param name="month">Optional month filter.</param>
     /// <param name="year">Optional year filter.</param>
     /// <returns>List of all attendance records.</returns>
-    [HttpGet("all")]
+    [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize(Roles = "Administrator")]
 
-    public async Task<IActionResult> GetAllAttendances([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
+    public async Task<IActionResult> GetAllAttendances([FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
-        var result = await _sender.Send(new GetAllAttendancesQuery(day, month, year));
-        _logger.LogInformation("Fetched all attendances with filters - Day: {Day}, Month: {Month}, Year: {Year}", day, month, year);
+        var result = await _sender.Send(new GetAllAttendancesQuery(userId,day, month, year));
+        _logger.LogInformation("Fetched all attendances with filters - UserId: {UserId},Day: {Day}, Month: {Month}, Year: {Year}",userId, day, month, year);
         return Ok(result);
     }
 
@@ -99,7 +99,7 @@ public class AttendanceController : ControllerBase
     /// <param name="year">Optional year filter.</param>
     /// <returns>List of the user's attendance records.</returns>
     [Authorize]
-    [HttpGet("my")]
+    [HttpGet("me")]
     [Authorize(Roles = "Employee")]
 
     public async Task<IActionResult> GetMyAttendances([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)

@@ -1,13 +1,12 @@
 ﻿using Backend.Application.Common.Extensions;
 using Backend.Application.Common.Response;
 using Backend.Application.Features.Attendances.Dto;
-
 using System.Linq.Expressions;
 
 /// <summary>
 /// Query to get all attendances, optionally filtered by day/month/year.
 /// </summary>
-public record GetAllAttendancesQuery(int? Day, int? Month, int? Year) : IRequest<Response<List<AttendanceDto>>>;
+public record GetAllAttendancesQuery(string? UserId, int? Day, int? Month, int? Year) : IRequest<Response<List<AttendanceDto>>>;
 
 /// <summary>
 /// Handler for GetAllAttendancesQuery.
@@ -24,6 +23,12 @@ public class GetAllAttendancesQueryHandler : IRequestHandler<GetAllAttendancesQu
     public async Task<Response<List<AttendanceDto>>> Handle(GetAllAttendancesQuery request, CancellationToken cancellationToken)
     {
         Expression<Func<Attendance, bool>> filter = a => true;
+
+        if (!string.IsNullOrWhiteSpace(request.UserId))
+        {
+            var userId = request.UserId;
+            filter = Combine(filter, a => a.UserId == userId);
+        }
 
         if (request.Day.HasValue)
         {

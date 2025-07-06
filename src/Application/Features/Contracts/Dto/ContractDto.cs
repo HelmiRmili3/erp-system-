@@ -23,12 +23,13 @@ namespace Backend.Application.Features.Contracts.Dtos
         public ContractType ContractType { get; init; } = ContractType.Permanent;
         public DateTime StartDate { get; init; }
         public DateTime? EndDate { get; init; }
-        public string? FileUrl { get; init; }
         public EmployeeStatus Status { get; init; } = EmployeeStatus.Active;
     }
 
     public record ContractUpdateDto : ContractAddDto
     {
         public int Id { get; init; }
+        public string? FileUrl { get; init; }
+
     }
 }

@@ -1,26 +1,44 @@
-﻿using Backend.Application.Common.Response;
+﻿using System.Security.Claims;
+using Backend.Application.Common.Interfaces;
+using Backend.Application.Common.Response;
 using Backend.Application.Features.Contracts.Dtos;
 using Backend.Domain.Entities;
-using Backend.Application.Common.Interfaces;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Backend.Application.Features.Contracts.Commands;
 
-public record CreateContractCommand(ContractAddDto Contract) : IRequest<Response<int>>;
+/// <summary>
+/// Command to create a contract with file upload.
+/// </summary>
+public record CreateContractCommand(ContractAddDto Contract, IFormFile? File) : IRequest<Response<int>>;
 
 public class CreateContractCommandHandler : IRequestHandler<CreateContractCommand, Response<int>>
 {
     private readonly ICommandRepository<Contract> _repository;
+    private readonly IFileService _fileService;
 
-    public CreateContractCommandHandler(ICommandRepository<Contract> repository)
+    public CreateContractCommandHandler(
+        ICommandRepository<Contract> repository,
+        IFileService fileService)
     {
         _repository = repository;
+        _fileService = fileService;
     }
 
     public async Task<Response<int>> Handle(CreateContractCommand request, CancellationToken cancellationToken)
     {
         var dto = request.Contract;
+
+        string? fileUrl = null;
+
+        if (request.File is { Length: > 0 })
+        {
+            var fileName = $"{Guid.NewGuid()}";
+            var relativePath = await _fileService.SaveFileAsync(request.File, fileName, "contracts");
+            fileUrl = $"/files/{relativePath.Replace("\\", "/")}";
+        }
 
         var entity = new Contract
         {
@@ -28,12 +46,12 @@ public class CreateContractCommandHandler : IRequestHandler<CreateContractComman
             ContractType = dto.ContractType,
             StartDate = dto.StartDate.ToUniversalTime(),
             EndDate = dto.EndDate?.ToUniversalTime(),
-            FileUrl = dto.FileUrl,
+            FileUrl = fileUrl,
             Status = dto.Status
         };
 
         await _repository.AddAsync(entity, cancellationToken);
-        return new Response<int>(entity.Id, "Contract created successfully");
+        return new Response<int>(entity.Id, "Contract created successfully.");
     }
 }
 
@@ -41,9 +59,6 @@ public class CreateContractCommandValidator : AbstractValidator<CreateContractCo
 {
     public CreateContractCommandValidator()
     {
-        RuleFor(x => x.Contract.UserId)
-            .NotEmpty().WithMessage("UserId is required.");
-
         RuleFor(x => x.Contract.StartDate)
             .NotEmpty().WithMessage("Start date is required.");
 
@@ -51,5 +66,12 @@ public class CreateContractCommandValidator : AbstractValidator<CreateContractCo
             .GreaterThan(x => x.Contract.StartDate)
             .When(x => x.Contract.EndDate.HasValue)
             .WithMessage("End date must be after the start date.");
+
+        When(x => x.File != null, () =>
+        {
+            RuleFor(x => x.File!.Length)
+                .LessThanOrEqualTo(10 * 1024 * 1024) // e.g., Max 10MB
+                .WithMessage("File must be less than or equal to 10MB.");
+        });
     }
 }

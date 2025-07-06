@@ -9,7 +9,7 @@ namespace Backend.Web.Controllers;
 /// Manages employee payrolls.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class PayrollController : ControllerBase
 {
     private readonly ISender _sender;
@@ -64,7 +64,7 @@ public class PayrollController : ControllerBase
     /// <summary>
     /// Get all payrolls (optionally filter by user or period).
     /// </summary>
-    [HttpGet("all")]
+    [HttpGet()]
     [Authorize(Roles = "Administrator")]
 
     public async Task<IActionResult> GetAllPayrolls(
@@ -97,7 +97,7 @@ public class PayrollController : ControllerBase
     /// <summary>
     /// Get payrolls for the currently authenticated user.
     /// </summary>
-    [HttpGet("my")]
+    [HttpGet("me")]
     [Authorize(Roles = "Employee")]
 
     public async Task<IActionResult> GetMyPayrolls(

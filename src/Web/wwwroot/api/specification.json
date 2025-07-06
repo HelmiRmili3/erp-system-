@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/Absence": {
+    "/api/Absences": {
       "get": {
         "tags": [
           "Absence"
@@ -72,7 +72,7 @@
         ]
       }
     },
-    "/api/Absence/{id}": {
+    "/api/Absences/{id}": {
       "get": {
         "tags": [
           "Absence"
@@ -200,7 +200,7 @@
         ]
       }
     },
-    "/api/Absence/my": {
+    "/api/Absences/me": {
       "get": {
         "tags": [
           "Absence"
@@ -641,7 +641,7 @@
         ]
       }
     },
-    "/api/Attendance/mark": {
+    "/api/Attendances/mark": {
       "post": {
         "tags": [
           "Attendance"
@@ -683,7 +683,7 @@
         ]
       }
     },
-    "/api/Attendance/{id}": {
+    "/api/Attendances/{id}": {
       "delete": {
         "tags": [
           "Attendance"
@@ -725,19 +725,19 @@
         ]
       }
     },
-    "/api/Attendance/user/{userId}": {
+    "/api/Attendances": {
       "get": {
         "tags": [
           "Attendance"
         ],
-        "operationId": "Attendance_GetUserAttendances",
+        "operationId": "Attendance_GetAllAttendances",
         "parameters": [
           {
             "name": "userId",
-            "in": "path",
-            "required": true,
+            "in": "query",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             },
             "x-position": 1
           },
@@ -786,59 +786,7 @@
         ]
       }
     },
-    "/api/Attendance/all": {
-      "get": {
-        "tags": [
-          "Attendance"
-        ],
-        "operationId": "Attendance_GetAllAttendances",
-        "parameters": [
-          {
-            "name": "day",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 1
-          },
-          {
-            "name": "month",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
-            "name": "year",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 3
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": [
-              "Administrator"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/Attendance/my": {
+    "/api/Attendances/me": {
       "get": {
         "tags": [
           "Attendance"
@@ -1046,7 +994,7 @@
         ]
       }
     },
-    "/api/Auth/current-user": {
+    "/api/Auth/me": {
       "get": {
         "tags": [
           "Auth"
@@ -1072,23 +1020,43 @@
         ]
       }
     },
-    "/api/Certification": {
+    "/api/Certifications": {
       "post": {
         "tags": [
           "Certification"
         ],
         "operationId": "Certification_CreateCertification",
         "requestBody": {
-          "x-name": "command",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/CreateCertificationCommand"
+                "type": "object",
+                "properties": {
+                  "Certification.UserId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Certification.Name": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Certification.Authority": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Certification.DateObtained": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary",
+                    "nullable": true
+                  }
+                }
               }
             }
-          },
-          "required": true,
-          "x-position": 1
+          }
         },
         "responses": {
           "200": {
@@ -1142,69 +1110,7 @@
             ]
           }
         ]
-      }
-    },
-    "/api/Certification/{id}": {
-      "delete": {
-        "tags": [
-          "Certification"
-        ],
-        "operationId": "Certification_DeleteCertification",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": [
-              "Administrator"
-            ]
-          }
-        ]
       },
-      "get": {
-        "tags": [
-          "Certification"
-        ],
-        "operationId": "Certification_GetCertificationById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
-      }
-    },
-    "/api/Certification/all": {
       "get": {
         "tags": [
           "Certification"
@@ -1265,7 +1171,67 @@
         ]
       }
     },
-    "/api/Certification/my": {
+    "/api/Certifications/{id}": {
+      "delete": {
+        "tags": [
+          "Certification"
+        ],
+        "operationId": "Certification_DeleteCertification",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Certification"
+        ],
+        "operationId": "Certification_GetCertificationById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Certifications/me": {
       "get": {
         "tags": [
           "Certification"
@@ -1317,54 +1283,48 @@
         ]
       }
     },
-    "/api/Certification/user/{userId}": {
-      "get": {
-        "tags": [
-          "Certification"
-        ],
-        "operationId": "Certification_GetUserCertifications",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": [
-              "Administrator"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/Contract": {
+    "/api/Contracts": {
       "post": {
         "tags": [
           "Contract"
         ],
         "operationId": "Contract_CreateContract",
         "requestBody": {
-          "x-name": "command",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/CreateContractCommand"
+                "type": "object",
+                "properties": {
+                  "Contract.UserId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Contract.ContractType": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Contract.StartDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "Contract.EndDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                  },
+                  "Contract.Status": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary",
+                    "nullable": true
+                  }
+                }
               }
             }
-          },
-          "required": true,
-          "x-position": 1
+          }
         },
         "responses": {
           "200": {
@@ -1418,69 +1378,7 @@
             ]
           }
         ]
-      }
-    },
-    "/api/Contract/{id}": {
-      "delete": {
-        "tags": [
-          "Contract"
-        ],
-        "operationId": "Contract_DeleteContract",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": [
-              "Administrator"
-            ]
-          }
-        ]
       },
-      "get": {
-        "tags": [
-          "Contract"
-        ],
-        "operationId": "Contract_GetContractById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
-      }
-    },
-    "/api/Contract/all": {
       "get": {
         "tags": [
           "Contract"
@@ -1541,7 +1439,67 @@
         ]
       }
     },
-    "/api/Contract/my": {
+    "/api/Contracts/{id}": {
+      "delete": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "Contract_DeleteContract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "Contract_GetContractById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Contracts/me": {
       "get": {
         "tags": [
           "Contract"
@@ -1593,7 +1551,7 @@
         ]
       }
     },
-    "/api/Expense": {
+    "/api/Expenses": {
       "post": {
         "tags": [
           "Expense"
@@ -1683,9 +1641,68 @@
             ]
           }
         ]
+      },
+      "get": {
+        "tags": [
+          "Expense"
+        ],
+        "operationId": "Expense_GetAllExpenses",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "day",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       }
     },
-    "/api/Expense/{id}": {
+    "/api/Expenses/{id}": {
       "delete": {
         "tags": [
           "Expense"
@@ -1747,68 +1764,7 @@
         ]
       }
     },
-    "/api/Expense/all": {
-      "get": {
-        "tags": [
-          "Expense"
-        ],
-        "operationId": "Expense_GetAllExpenses",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "nullable": true
-            },
-            "x-position": 1
-          },
-          {
-            "name": "day",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
-            "name": "month",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 3
-          },
-          {
-            "name": "year",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 4
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": [
-              "Administrator"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/Expense/my": {
+    "/api/Expenses/me": {
       "get": {
         "tags": [
           "Expense"
@@ -1860,7 +1816,7 @@
         ]
       }
     },
-    "/api/Payroll": {
+    "/api/Payrolls": {
       "post": {
         "tags": [
           "Payroll"
@@ -1967,9 +1923,66 @@
             ]
           }
         ]
+      },
+      "get": {
+        "tags": [
+          "Payroll"
+        ],
+        "operationId": "Payroll_GetAllPayrolls",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
       }
     },
-    "/api/Payroll/{id}": {
+    "/api/Payrolls/{id}": {
       "delete": {
         "tags": [
           "Payroll"
@@ -2045,66 +2058,7 @@
         ]
       }
     },
-    "/api/Payroll/all": {
-      "get": {
-        "tags": [
-          "Payroll"
-        ],
-        "operationId": "Payroll_GetAllPayrolls",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "nullable": true
-            },
-            "x-position": 1
-          },
-          {
-            "name": "month",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
-            "name": "year",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 3
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": [
-              "Administrator"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/Payroll/my": {
+    "/api/Payrolls/me": {
       "get": {
         "tags": [
           "Payroll"
@@ -2585,39 +2539,6 @@
           }
         }
       },
-      "CreateCertificationCommand": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CreateCertificationDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false
-          }
-        ]
-      },
-      "CreateCertificationDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "userId": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "authority": {
-            "type": "string"
-          },
-          "dateObtained": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "fileUrl": {
-            "type": "string"
-          }
-        }
-      },
       "UpdateCertificationCommand": {
         "allOf": [
           {
@@ -2641,45 +2562,30 @@
               "id": {
                 "type": "integer",
                 "format": "int32"
+              },
+              "fileUrl": {
+                "type": "string"
               }
             }
           }
         ]
       },
-      "CreateContractCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "contract": {
-            "$ref": "#/components/schemas/ContractAddDto"
-          }
-        }
-      },
-      "ContractAddDto": {
+      "CreateCertificationDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "userId": {
             "type": "string"
           },
-          "contractType": {
-            "$ref": "#/components/schemas/ContractType"
+          "name": {
+            "type": "string"
           },
-          "startDate": {
+          "authority": {
+            "type": "string"
+          },
+          "dateObtained": {
             "type": "string",
             "format": "date-time"
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "fileUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "$ref": "#/components/schemas/EmployeeStatus"
           }
         }
       },
@@ -2704,10 +2610,38 @@
               "id": {
                 "type": "integer",
                 "format": "int32"
+              },
+              "fileUrl": {
+                "type": "string",
+                "nullable": true
               }
             }
           }
         ]
+      },
+      "ContractAddDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "contractType": {
+            "$ref": "#/components/schemas/ContractType"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/EmployeeStatus"
+          }
+        }
       },
       "UpdateExpenseCommand": {
         "type": "object",

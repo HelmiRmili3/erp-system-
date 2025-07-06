@@ -11,7 +11,7 @@ namespace Backend.Web.Controllers;
 /// Handles operations related to employee contracts.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class ContractController : ControllerBase
 {
     private readonly ISender _sender;
@@ -31,9 +31,8 @@ public class ContractController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Produces("application/json")]
     [Authorize(Roles = "Administrator")]
-
-
-    public async Task<IActionResult> CreateContract([FromBody] CreateContractCommand command)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateContract([FromForm] CreateContractCommand command)
     {
         var result = await _sender.Send(command);
         _logger.LogInformation("Created contract: {@Result}", result);
@@ -73,7 +72,7 @@ public class ContractController : ControllerBase
     /// <summary>
     /// Get all contracts (optionally filter by user and date).
     /// </summary>
-    [HttpGet("all")]
+    [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
     [Authorize(Roles = "Administrator")]
@@ -88,7 +87,7 @@ public class ContractController : ControllerBase
     /// <summary>
     /// Get contracts for the currently logged-in user.
     /// </summary>
-    [HttpGet("my")]
+    [HttpGet("me")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
     [Authorize(Roles = "Employee")]

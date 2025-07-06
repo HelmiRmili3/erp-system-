@@ -12,7 +12,7 @@ namespace Backend.Web.Controllers;
 /// Handles operations related to employee certifications.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class CertificationController : ControllerBase
 {
     private readonly ISender _sender;
@@ -32,8 +32,9 @@ public class CertificationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Produces("application/json")]
     [Authorize(Roles = "Administrator")]
+    [Consumes("multipart/form-data")]
 
-    public async Task<IActionResult> CreateCertification([FromBody] CreateCertificationCommand command)
+    public async Task<IActionResult> CreateCertification([FromForm] CreateCertificationCommand command)
     {
         var result = await _sender.Send(command);
         _logger.LogInformation("Created certification: {@Result}", result);
@@ -73,7 +74,7 @@ public class CertificationController : ControllerBase
     /// <summary>
     /// Get all certifications (optionally filter by user and date).
     /// </summary>
-    [HttpGet("all")]
+    [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
     [Authorize(Roles = "Administrator")]
@@ -88,7 +89,7 @@ public class CertificationController : ControllerBase
     /// <summary>
     /// Get certifications for the currently logged-in user.
     /// </summary>
-    [HttpGet("my")]
+    [HttpGet("me")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
     [Authorize(Roles = "Employee")]
@@ -103,22 +104,6 @@ public class CertificationController : ControllerBase
         _logger.LogInformation("Fetched certifications for current user {UserId}", userId);
         return  Ok(result);
     }
-
-    /// <summary>
-    /// Get all certifications for a specific user.
-    /// </summary>
-    [HttpGet("user/{userId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
-
-    public async Task<IActionResult> GetUserCertifications(string userId)
-    {
-        var result = await _sender.Send(new GetCertificationsByUserIdQuery(userId));
-        _logger.LogInformation("Fetched certifications for user {UserId}", userId);
-        return Ok(result);
-    }
-
     /// <summary>
     /// Get a certification by its ID.
     /// </summary>

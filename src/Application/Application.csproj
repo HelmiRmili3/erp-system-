@@ -21,11 +21,4 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\User\Commands\" />
-    <Folder Include="Features\User\IRepositories\" />
-    <Folder Include="Features\User\Dto\" />
-    <Folder Include="Features\User\Queries\" />
-  </ItemGroup>
-
 </Project>

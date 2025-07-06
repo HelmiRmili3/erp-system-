@@ -21,11 +21,12 @@
         public required string Name { get; init; }
         public required string Authority { get; init; }
         public required DateTime DateObtained { get; init; }
-        public required string FileUrl { get; init; }
     }
 
     public record UpdateCertificationDto : CreateCertificationDto
     {
         public int Id { get; init; }
+        public required string FileUrl { get; init; }
+
     }
 }
