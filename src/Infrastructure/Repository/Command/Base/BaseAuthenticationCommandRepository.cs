@@ -107,18 +107,21 @@ namespace Backend.Infrastructure.Repository.Command.Base
             if (!passwordValid)
                 return new Response<LoginResultDto>("Invalid email or password");
 
+            // Build base claims
             List<Claim> authClaims = new()
-            {
-                new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.GivenName, user.FirstName),
-                new Claim(ClaimTypes.Surname, user.LastName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+    {
+        new Claim(ClaimTypes.Email, email),
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.GivenName, user.FirstName),
+        new Claim(ClaimTypes.Surname, user.LastName),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
 
+            // Add user roles as claims
             var userRoles = await _userManager.GetRolesAsync(user);
             authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
+            // Add additional claims if not already present
             var existingClaims = await _userManager.GetClaimsAsync(user);
             foreach (var claim in existingClaims)
             {
@@ -126,19 +129,28 @@ namespace Backend.Infrastructure.Repository.Command.Base
                     authClaims.Add(claim);
             }
 
-            // Use updated JwtTokenService methods
+            // Generate tokens
             var accessToken = _jwtTokenService.GenerateAccessToken(authClaims);
             var refreshToken = _jwtTokenService.GenerateRefreshToken(authClaims);
 
             await _context.SaveChangesAsync();
 
+            // Build LoginResultDto
             var loginResult = new LoginResultDto
             {
-                Token = accessToken,
-                RefreshToken = refreshToken,
-                UserId = user.Id,
+                Id = user.Id,
                 Email = user.Email ?? string.Empty,
-                UserName = user.UserName ?? string.Empty
+                UserName = user.UserName ?? string.Empty,
+                FirstName = user.FirstName ?? string.Empty,
+                LastName = user.LastName ?? string.Empty,
+                Status = user.Status.ToString(),
+                Roles = userRoles.ToList(),
+                Claims = existingClaims
+                    .Select(c => new ClaimDto { Type = c.Type, Value = c.Value })
+                    .ToList(),
+
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
             };
 
             return new Response<LoginResultDto>(loginResult, "Login successful");
@@ -203,9 +215,9 @@ namespace Backend.Infrastructure.Repository.Command.Base
 
             return new Response<LoginResultDto>(new LoginResultDto
             {
-                Token = newAccessToken,
+                AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken,
-                UserId = user.Id,
+                Id = user.Id,
                 Email = user.Email ?? "",
                 UserName = user.UserName ?? ""
             }, "Token refreshed successfully");
