@@ -31,34 +31,54 @@ public class AdminQueryRepository : IAdminQueryRepository
     }
 
     public async Task<Response<List<ClaimWithRolesDto>>> GetClaimsWithRolesAsync(CancellationToken cancellationToken = default)
-    {
-        var roles = _roleManager.Roles.ToList();
-        var result = new List<ClaimWithRolesDto>();
+{
+    var roles = _roleManager.Roles.ToList();
+    var result = new List<ClaimWithRolesDto>();
 
-        foreach (var role in roles)
+    // Get all known claims with generated IDs
+    var allClaims = await GetAllClaimsAsync();
+
+    foreach (var role in roles)
+    {
+        var claims = await _roleManager.GetClaimsAsync(role);
+
+        foreach (var claim in claims)
         {
-            var claims = await _roleManager.GetClaimsAsync(role);
-            foreach (var claim in claims)
+            // Find matching claim with ID
+            var matchingClaim = allClaims.FirstOrDefault(c => c.Type == claim.Type && c.Value == claim.Value);
+
+            var existing = result.FirstOrDefault(r => r.Type == claim.Type && r.Value == claim.Value);
+            if (existing == null)
             {
-                var existing = result.FirstOrDefault(r => r.Type == claim.Type && r.Value == claim.Value);
-                if (existing == null)
+                result.Add(new ClaimWithRolesDto
                 {
-                    result.Add(new ClaimWithRolesDto
-                    {
-                        Type = claim.Type,
-                        Value = claim.Value,
-                        Roles = new List<RoleDto> { new RoleDto { Id = role.Id, Name = role.ToString() } }
-                    });
-                }
-                else
-                {
-                    existing.Roles.Add(new RoleDto { Id = role.Id, Name = role.ToString() });
-                }
+                    ClaimId = matchingClaim?.Id ?? 0,
+                    Type = claim.Type,
+                    Value = claim.Value,
+                    Roles = new List<RoleDto> 
+                    { 
+                        new RoleDto 
+                        { 
+                            Id = role.Id, 
+                            Name = role.ToString() 
+                        } 
+                    }
+                });
+            }
+            else
+            {
+                existing.Roles.Add(new RoleDto 
+                { 
+                    Id = role.Id,
+                    Name = role.ToString()
+                });
             }
         }
-
-        return new Response<List<ClaimWithRolesDto>>(result);
     }
+
+    return new Response<List<ClaimWithRolesDto>>(result);
+}
+
 
     public async Task<Response<RoleDto>> GetRoleByIdAsync(string roleId, CancellationToken cancellationToken = default)
     {
@@ -84,19 +104,35 @@ public class AdminQueryRepository : IAdminQueryRepository
         var roles = _roleManager.Roles.ToList();
         var result = new List<RoleWithClaimsDto>();
 
+        // Get all claims with generated IDs
+        var allClaims = await GetAllClaimsAsync();
+
         foreach (var role in roles)
         {
             var claims = await _roleManager.GetClaimsAsync(role);
+
+            var claimDtos = claims.Select(c =>
+            {
+                var matchingClaim = allClaims.FirstOrDefault(ac => ac.Type == c.Type && ac.Value == c.Value);
+                return new ClaimDto
+                {
+                    Id = matchingClaim?.Id ?? 0,
+                    Type = c.Type,
+                    Value = c.Value
+                };
+            }).ToList();
+
             result.Add(new RoleWithClaimsDto
             {
                 RoleId = role.Id,
                 RoleName = role.ToString(),
-                Claims = claims.Select(c => new ClaimDto { Type = c.Type, Value = c.Value }).ToList()
+                Claims = claimDtos
             });
         }
 
         return new Response<List<RoleWithClaimsDto>>(result);
     }
+
 
     private async Task<List<ClaimDto>> GetAllClaimsAsync()
     {
