@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Backend.Application.Services;
+using Backend.Domain.Entities;
 
 namespace Backend.Infrastructure.Data;
 
@@ -16,6 +17,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Expense> Expenses { get; set; }
     public DbSet<Payroll> Payrolls { get; set; }
     public DbSet<Certification> Certifications { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<RolePermission> RolePermissions { get; set; }
+    public DbSet<UserPermission> UserPermissions { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
 
 

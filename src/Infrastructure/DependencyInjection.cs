@@ -29,6 +29,7 @@ using Backend.Application.Features.Certifications.IRepositories;
 using Backend.Application.Features.Contracts.IRepositories;
 using Backend.Application.Features.Expenses.IRepositories;
 using Backend.Application.Features.Payrolls.IRepositories;
+using Backend.Application.Features.Admin.Repositories;
 
 namespace Backend.Infrastructure;
 

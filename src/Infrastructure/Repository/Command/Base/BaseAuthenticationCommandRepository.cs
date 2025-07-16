@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Backend.Application.Common.Interfaces;
 using Backend.Application.Common.Response;
+using Backend.Application.Common.Settings;
 using Backend.Application.Features.Authentication.Dto;
 using Backend.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
@@ -136,22 +137,17 @@ namespace Backend.Infrastructure.Repository.Command.Base
             await _context.SaveChangesAsync();
 
             // Build LoginResultDto
+            var expiresInSeconds = 60 * 60;
+
             var loginResult = new LoginResultDto
             {
-                Id = user.Id,
-                Email = user.Email ?? string.Empty,
-                UserName = user.UserName ?? string.Empty,
-                FirstName = user.FirstName ?? string.Empty,
-                LastName = user.LastName ?? string.Empty,
-                Status = user.Status.ToString(),
-                Roles = userRoles.ToList(),
-                Claims = existingClaims
-                    .Select(c => new ClaimDto { Type = c.Type, Value = c.Value })
-                    .ToList(),
-
                 AccessToken = accessToken,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+
+                TokenType = "Bearer",
+                ExpiresIn = expiresInSeconds
             };
+
 
             return new Response<LoginResultDto>(loginResult, "Login successful");
         }
@@ -217,9 +213,6 @@ namespace Backend.Infrastructure.Repository.Command.Base
             {
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken,
-                Id = user.Id,
-                Email = user.Email ?? "",
-                UserName = user.UserName ?? ""
             }, "Token refreshed successfully");
         }
     }

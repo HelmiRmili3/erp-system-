@@ -3,6 +3,7 @@ using System;
 using Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716155840_AddPermissionsTable")]
+    partial class AddPermissionsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -304,36 +307,6 @@ namespace Backend.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Attendance", (string)null);
-                });
-
-            modelBuilder.Entity("Backend.Domain.Entities.RolePermission", b =>
-                {
-                    b.Property<string>("RoleId")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("PermissionId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("RoleId", "PermissionId");
-
-                    b.HasIndex("PermissionId");
-
-                    b.ToTable("RolePermissions");
-                });
-
-            modelBuilder.Entity("Backend.Domain.Entities.UserPermission", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("PermissionId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("UserId", "PermissionId");
-
-                    b.HasIndex("PermissionId");
-
-                    b.ToTable("UserPermissions");
                 });
 
             modelBuilder.Entity("Category", b =>
@@ -812,40 +785,6 @@ namespace Backend.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Backend.Domain.Entities.RolePermission", b =>
-                {
-                    b.HasOne("Permission", "Permission")
-                        .WithMany("RolePermissions")
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ApplicationRole", null)
-                        .WithMany("RolePermissions")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Permission");
-                });
-
-            modelBuilder.Entity("Backend.Domain.Entities.UserPermission", b =>
-                {
-                    b.HasOne("Permission", "Permission")
-                        .WithMany()
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ApplicationUser", null)
-                        .WithMany("UserPermissions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Permission");
-                });
-
             modelBuilder.Entity("Category", b =>
                 {
                     b.HasOne("Category", "ParentCategory")
@@ -959,11 +898,6 @@ namespace Backend.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ApplicationRole", b =>
-                {
-                    b.Navigation("RolePermissions");
-                });
-
             modelBuilder.Entity("ApplicationUser", b =>
                 {
                     b.Navigation("Absences");
@@ -979,18 +913,11 @@ namespace Backend.Infrastructure.Migrations
                     b.Navigation("Payrolls");
 
                     b.Navigation("Subordinates");
-
-                    b.Navigation("UserPermissions");
                 });
 
             modelBuilder.Entity("Category", b =>
                 {
                     b.Navigation("SubCategories");
-                });
-
-            modelBuilder.Entity("Permission", b =>
-                {
-                    b.Navigation("RolePermissions");
                 });
 #pragma warning restore 612, 618
         }

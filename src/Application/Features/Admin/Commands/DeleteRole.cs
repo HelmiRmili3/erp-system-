@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Backend.Application.Features.Admin.Commands
 {
-    public record DeleteRoleCommand(string RoleId) : IRequest<Result>;
+    public record DeleteRoleCommand(string Role) : IRequest<Result>;
 
     public class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Result>
     {
@@ -18,7 +18,7 @@ namespace Backend.Application.Features.Admin.Commands
 
         public async Task<Result> Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
         {
-            return await _adminRepository.DeleteRoleAsync(request.RoleId);
+            return await _adminRepository.DeleteRoleAsync(request.Role);
         
         }
     }
@@ -27,9 +27,9 @@ namespace Backend.Application.Features.Admin.Commands
     {
         public DeleteRoleCommandValidator()
         {
-            RuleFor(v => v.RoleId)
+            RuleFor(v => v.Role)
                 .NotEmpty()
-                .WithMessage("Role ID is required");
+                .WithMessage("Role name is required");
         }
     }
 }

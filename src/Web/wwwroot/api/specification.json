@@ -27,9 +27,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -65,9 +63,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Employee"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -153,9 +149,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -193,9 +187,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Employee"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -290,18 +282,18 @@
         ]
       }
     },
-    "/api/Admin/assign-claim-to-role": {
+    "/api/Admin/assign-permissions-to-role": {
       "post": {
         "tags": [
           "Admin"
         ],
-        "operationId": "Admin_AssignPermissionToRole",
+        "operationId": "Admin_AssignPermissionsToRole",
         "requestBody": {
           "x-name": "command",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AssignClaimToRoleCommand"
+                "$ref": "#/components/schemas/AssignPermissionsToRoleCommand"
               }
             }
           },
@@ -330,18 +322,18 @@
         ]
       }
     },
-    "/api/Admin/assign-role-to-user": {
+    "/api/Admin/assign-roles-to-user": {
       "post": {
         "tags": [
           "Admin"
         ],
-        "operationId": "Admin_AssignRoleToUser",
+        "operationId": "Admin_AssignRolesToUser",
         "requestBody": {
           "x-name": "command",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AssignRoleToUserCommand"
+                "$ref": "#/components/schemas/AssignRolesToUserCommand"
               }
             }
           },
@@ -370,7 +362,47 @@
         ]
       }
     },
-    "/api/Admin/delete-role": {
+    "/api/Admin/remove-permissions-from-role": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_RemovePermissionsFromRole",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletePermissionsFromRoleCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/Admin/role": {
       "delete": {
         "tags": [
           "Admin"
@@ -410,120 +442,12 @@
         ]
       }
     },
-    "/api/Admin/delete-claim": {
-      "delete": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_DeleteClaim",
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteRoleClaimCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": [
-              "Administrator"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/Admin/claims": {
+    "/api/Admin/permissions": {
       "get": {
         "tags": [
           "Admin"
         ],
-        "operationId": "Admin_GetClaims",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": [
-              "Administrator"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/Admin/claims-with-roles": {
-      "get": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_GetClaimsWithRoles",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": [
-              "Administrator"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/Admin/claim/{id}": {
-      "get": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_GetClaimById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
+        "operationId": "Admin_GetPermissions",
         "responses": {
           "200": {
             "description": "",
@@ -574,51 +498,12 @@
         ]
       }
     },
-    "/api/Admin/role/{id}": {
+    "/api/Admin/rolesPermissions": {
       "get": {
         "tags": [
           "Admin"
         ],
-        "operationId": "Admin_GetRoleById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": [
-              "Administrator"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/Admin/roles-with-claims": {
-      "get": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_GetRolesWithClaims",
+        "operationId": "Admin_GetRolesPermissions",
         "responses": {
           "200": {
             "description": "",
@@ -2249,30 +2134,48 @@
           }
         }
       },
-      "AssignClaimToRoleCommand": {
+      "AssignPermissionsToRoleCommand": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "roleName": {
+          "role": {
             "type": "string"
           },
-          "claimType": {
-            "type": "string"
-          },
-          "claimValue": {
-            "type": "string"
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
-      "AssignRoleToUserCommand": {
+      "AssignRolesToUserCommand": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "userId": {
             "type": "string"
           },
-          "roleName": {
+          "roleNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DeletePermissionsFromRoleCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "role": {
             "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -2280,22 +2183,7 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "roleId": {
-            "type": "string"
-          }
-        }
-      },
-      "DeleteRoleClaimCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "roleId": {
-            "type": "string"
-          },
-          "claimType": {
-            "type": "string"
-          },
-          "claimValue": {
+          "role": {
             "type": "string"
           }
         }

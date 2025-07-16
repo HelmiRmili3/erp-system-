@@ -1,156 +1,101 @@
 ﻿using Backend.Application.Common.Response;
 using Backend.Application.Features.Admin.Dto;
 using Backend.Application.Features.Admin.IRepositories;
-using Microsoft.AspNetCore.Identity;
+using Backend.Infrastructure.Data;
+using Backend.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Infrastructure.Repository.Query;
+namespace Backend.Application.Features.Admin.Repositories;
 
 public class AdminQueryRepository : IAdminQueryRepository
 {
-    private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly ApplicationDbContext _context;
 
-    public AdminQueryRepository(RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
+    public AdminQueryRepository(ApplicationDbContext context)
     {
-        _roleManager = roleManager;
+        _context = context;
     }
 
-    public async Task<Response<ClaimDto>> GetClaimByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Response<List<PermissionDto>>> GetPermissionsAsync(CancellationToken cancellationToken = default)
     {
-        var allClaims = await GetAllClaimsAsync();
-        var claim = allClaims.FirstOrDefault(c => c.Id == id);
-
-        return claim == null
-            ? new Response<ClaimDto>("Claim not found")
-            : new Response<ClaimDto>(claim);
-    }
-
-    public async Task<Response<List<ClaimDto>>> GetClaimsAsync(CancellationToken cancellationToken = default)
-    {
-        var claims = await GetAllClaimsAsync();
-        return new Response<List<ClaimDto>>(claims);
-    }
-
-    public async Task<Response<List<ClaimWithRolesDto>>> GetClaimsWithRolesAsync(CancellationToken cancellationToken = default)
-{
-    var roles = _roleManager.Roles.ToList();
-    var result = new List<ClaimWithRolesDto>();
-
-    // Get all known claims with generated IDs
-    var allClaims = await GetAllClaimsAsync();
-
-    foreach (var role in roles)
-    {
-        var claims = await _roleManager.GetClaimsAsync(role);
-
-        foreach (var claim in claims)
-        {
-            // Find matching claim with ID
-            var matchingClaim = allClaims.FirstOrDefault(c => c.Type == claim.Type && c.Value == claim.Value);
-
-            var existing = result.FirstOrDefault(r => r.Type == claim.Type && r.Value == claim.Value);
-            if (existing == null)
+        var permissions = await _context.Permissions
+            .Select(p => new PermissionDto
             {
-                result.Add(new ClaimWithRolesDto
-                {
-                    ClaimId = matchingClaim?.Id ?? 0,
-                    Type = claim.Type,
-                    Value = claim.Value,
-                    Roles = new List<RoleDto> 
-                    { 
-                        new RoleDto 
-                        { 
-                            Id = role.Id, 
-                            Name = role.ToString() 
-                        } 
-                    }
-                });
-            }
-            else
-            {
-                existing.Roles.Add(new RoleDto 
-                { 
-                    Id = role.Id,
-                    Name = role.ToString()
-                });
-            }
-        }
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description
+            })
+            .ToListAsync(cancellationToken);
+
+        return new Response<List<PermissionDto>>(permissions);
     }
 
-    return new Response<List<ClaimWithRolesDto>>(result);
-}
-
-
-    public async Task<Response<RoleDto>> GetRoleByIdAsync(string roleId, CancellationToken cancellationToken = default)
+    public async Task<Response<PermissionDto>> GetPermissionByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var role = await _roleManager.FindByIdAsync(roleId);
-        return role == null
-            ? new Response<RoleDto>("Role not found")
-            : new Response<RoleDto>(new RoleDto { Id = role.Id, Name = role.ToString() });
+        var permission = await _context.Permissions
+            .Where(p => p.Id == id)
+            .Select(p => new PermissionDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (permission == null)
+            return new Response<PermissionDto>("Permission not found");
+
+        return new Response<PermissionDto>(permission);
     }
 
- 
     public async Task<Response<List<RoleDto>>> GetRolesAsync(CancellationToken cancellationToken = default)
     {
-        var roles = await Task.Run(() =>
-            _roleManager.Roles
-                .Select(r => new RoleDto { Id = r.Id, Name = r.ToString() })
-                .ToList(), cancellationToken);
+        var roles = await _context.ApplicationRoles
+            .Select(r => new RoleDto
+            {
+                Id = r.Id,
+                Name = r.Name!
+            })
+            .ToListAsync(cancellationToken);
 
         return new Response<List<RoleDto>>(roles);
     }
 
-    public async Task<Response<List<RoleWithClaimsDto>>> GetRolesWithClaimsAsync(CancellationToken cancellationToken = default)
+    public async Task<Response<RoleDto>> GetRoleByIdAsync(string roleId, CancellationToken cancellationToken = default)
     {
-        var roles = _roleManager.Roles.ToList();
-        var result = new List<RoleWithClaimsDto>();
-
-        // Get all claims with generated IDs
-        var allClaims = await GetAllClaimsAsync();
-
-        foreach (var role in roles)
-        {
-            var claims = await _roleManager.GetClaimsAsync(role);
-
-            var claimDtos = claims.Select(c =>
+        var role = await _context.ApplicationRoles
+            .Where(r => r.Id == roleId)
+            .Select(r => new RoleDto
             {
-                var matchingClaim = allClaims.FirstOrDefault(ac => ac.Type == c.Type && ac.Value == c.Value);
-                return new ClaimDto
-                {
-                    Id = matchingClaim?.Id ?? 0,
-                    Type = c.Type,
-                    Value = c.Value
-                };
-            }).ToList();
+                Id = r.Id,
+                Name = r.Name!
+            })
+            .FirstOrDefaultAsync(cancellationToken);
 
-            result.Add(new RoleWithClaimsDto
-            {
-                RoleId = role.Id,
-                RoleName = role.ToString(),
-                Claims = claimDtos
-            });
-        }
+        if (role == null)
+            return new Response<RoleDto>("Role not found");
 
-        return new Response<List<RoleWithClaimsDto>>(result);
+        return new Response<RoleDto>(role);
     }
 
-
-    private async Task<List<ClaimDto>> GetAllClaimsAsync()
+    public async Task<Response<List<RoleWithPermissionsDto>>> GetRolesWithPermissionsAsync(CancellationToken cancellationToken = default)
     {
-        var result = new List<ClaimDto>();
-        var roles = _roleManager.Roles.ToList();
-
-        foreach (var role in roles)
-        {
-            var claims = await _roleManager.GetClaimsAsync(role);
-            foreach (var claim in claims)
+        var rolesWithPermissions = await _context.ApplicationRoles
+            .Include(r => r.RolePermissions)
+                .ThenInclude(rp => rp.Permission)
+            .Select(r => new RoleWithPermissionsDto
             {
-                if (!result.Any(c => c.Type == claim.Type && c.Value == claim.Value))
+                Id = r.Id,
+                Name = r.Name!,
+                Permissions = r.RolePermissions.Select(rp => new PermissionDto
                 {
-                    result.Add(new ClaimDto { Type = claim.Type, Value = claim.Value, Id = result.Count + 1 });
-                }
-            }
-        }
+                    Id = rp.Permission.Id,
+                    Name = rp.Permission.Name,
+                    Description = rp.Permission.Description
+                }).ToList()
+            })
+            .ToListAsync(cancellationToken);
 
-        return result;
+        return new Response<List<RoleWithPermissionsDto>>(rolesWithPermissions);
     }
 }

@@ -125,5 +125,18 @@ public class ApplicationDbContextInitialiser
             _context.Configurations.AddRange(defaultConfigs);
             await _context.SaveChangesAsync();
         }
+        // ➤ Seed Permissions
+        if (!_context.Permissions.Any())
+        {
+            var permissionEntities = Permissions.All.Select(p => new Permission
+            {
+                Name = p,
+                Description = $"Allows {p.Replace(".", " ").ToLower()} access"
+            });
+
+            _context.Permissions.AddRange(permissionEntities);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

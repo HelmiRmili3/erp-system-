@@ -1,6 +1,5 @@
 ﻿using Backend.Application.Features.Admin.Commands;
 using Backend.Application.Features.Admin.Queries;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +20,6 @@ namespace Backend.Web.Controllers
         }
 
         // ----- Commands -----
-
         [HttpPost("create-role")]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleCommand command)
         {
@@ -29,29 +27,30 @@ namespace Backend.Web.Controllers
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPost("assign-claim-to-role")]
-        public async Task<IActionResult> AssignPermissionToRole([FromBody] AssignClaimToRoleCommand command)
+        [HttpPost("assign-permissions-to-role")]
+        public async Task<IActionResult> AssignPermissionsToRole([FromBody] AssignPermissionsToRoleCommand command)
         {
             var result = await _sender.Send(command);
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPost("assign-role-to-user")]
-        public async Task<IActionResult> AssignRoleToUser([FromBody] AssignRoleToUserCommand command)
+        [HttpPost("assign-roles-to-user")]
+        public async Task<IActionResult> AssignRolesToUser([FromBody] AssignRolesToUserCommand command)
         {
             var result = await _sender.Send(command);
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
-        [HttpDelete("delete-role")]
+        [HttpDelete("remove-permissions-from-role")]
+        public async Task<IActionResult> RemovePermissionsFromRole([FromBody] DeletePermissionsFromRoleCommand command)
+        {
+            var result = await _sender.Send(command);
+            return result.Succeeded ? Ok(result) : BadRequest(result);
+        }
+
+
+        [HttpDelete("role")]
         public async Task<IActionResult> DeleteRole([FromBody] DeleteRoleCommand command)
-        {
-            var result = await _sender.Send(command);
-            return result.Succeeded ? Ok(result) : BadRequest(result);
-        }
-
-        [HttpDelete("delete-claim")]
-        public async Task<IActionResult> DeleteClaim([FromBody] DeleteRoleClaimCommand command)
         {
             var result = await _sender.Send(command);
             return result.Succeeded ? Ok(result) : BadRequest(result);
@@ -59,25 +58,11 @@ namespace Backend.Web.Controllers
 
         // ----- Queries -----
 
-        [HttpGet("claims")]
-        public async Task<IActionResult> GetClaims()
+        [HttpGet("permissions")]
+        public async Task<IActionResult> GetPermissions()
         {
-            var result = await _sender.Send(new GetClaimsQuery());
+            var result = await _sender.Send(new GetPermissionsQuery());
             return result.Succeeded ? Ok(result) : BadRequest(result);
-        }
-
-        [HttpGet("claims-with-roles")]
-        public async Task<IActionResult> GetClaimsWithRoles()
-        {
-            var result = await _sender.Send(new GetClaimsWithRolesQuery());
-            return result.Succeeded ? Ok(result) : BadRequest(result);
-        }
-
-        [HttpGet("claim/{id}")]
-        public async Task<IActionResult> GetClaimById(int id)
-        {
-            var result = await _sender.Send(new GetClaimByIdQuery(id));
-            return result.Succeeded ? Ok(result) : NotFound(result);
         }
 
         [HttpGet("roles")]
@@ -87,17 +72,11 @@ namespace Backend.Web.Controllers
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
-        [HttpGet("role/{id}")]
-        public async Task<IActionResult> GetRoleById(string id)
-        {
-            var result = await _sender.Send(new GetRoleByIdQuery(id));
-            return result.Succeeded ? Ok(result) : NotFound(result);
-        }
 
-        [HttpGet("roles-with-claims")]
-        public async Task<IActionResult> GetRolesWithClaims()
+        [HttpGet("rolesPermissions")]
+        public async Task<IActionResult> GetRolesPermissions()
         {
-            var result = await _sender.Send(new GetRolesWithClaimsQuery());
+            var result = await _sender.Send(new GetRolesWithPermissionsQuery());
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
     }

@@ -39,6 +39,8 @@ public class ApplicationUser : IdentityUser
     public virtual ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
     public virtual ICollection<Absence> Absences { get; set; } = new List<Absence>();
     public virtual ICollection<Expense> Expenses { get; set; } = new List<Expense>();
+    public virtual ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
+
 
     // Computed properties
     [NotMapped]

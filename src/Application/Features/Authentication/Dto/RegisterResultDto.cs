@@ -26,4 +26,13 @@ public class RegisterResultDto
 
     // Supervisor
     public string? SupervisorId { get; set; }
+
+    // ✅ New fields to include in /auth/me response
+
+    public List<string> Roles { get; set; } = new();
+
+    // These are all permissions from:
+    // - user direct permissions
+    // - permissions from assigned roles
+    public List<string> Permissions { get; set; } = new();
 }
