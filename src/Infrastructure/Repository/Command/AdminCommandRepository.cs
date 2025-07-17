@@ -165,7 +165,7 @@ public class AdminCommandRepository : IAdminCommandRepository
         {
             if (!role.RolePermissions.Any(rp => rp.PermissionId == permission.Id))
             {
-                role.RolePermissions.Add(new RolePermission
+                role.RolePermissions.Add(item: new RolePermission
                 {
                     RoleId = role.Id,
                     PermissionId = permission.Id

@@ -26,7 +26,7 @@ public class PayrollController : ControllerBase
     /// </summary>
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Payrolls.View")]
 
     public async Task<IActionResult> CreatePayroll([FromForm] CreatePayrollCommand command)
     {
@@ -40,8 +40,7 @@ public class PayrollController : ControllerBase
     /// Update an existing payroll.
     /// </summary>
     [HttpPut]
-    [Authorize(Roles = "Administrator")]
-
+    [Authorize(Policy = "Payrolls.Edit")]
     public async Task<IActionResult> UpdatePayroll([FromBody] UpdatePayrollCommand command)
     {
         var result = await _sender.Send(command);
@@ -53,7 +52,8 @@ public class PayrollController : ControllerBase
     /// Delete a payroll by ID.
     /// </summary>
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Payrolls.Delete")]
+
     public async Task<IActionResult> DeletePayroll(int id)
     {
         var result = await _sender.Send(new DeletePayrollCommand(id));
@@ -65,7 +65,8 @@ public class PayrollController : ControllerBase
     /// Get all payrolls (optionally filter by user or period).
     /// </summary>
     [HttpGet()]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Payrolls.View")]
+
 
     public async Task<IActionResult> GetAllPayrolls(
        [FromQuery] string? userId,
@@ -85,7 +86,7 @@ public class PayrollController : ControllerBase
     /// Get a payroll by ID.
     /// </summary>
     [HttpGet("{id}")]
-    [Authorize]
+    [Authorize(Policy = "Payrolls.View")]
 
     public async Task<IActionResult> GetPayrollById(int id)
     {

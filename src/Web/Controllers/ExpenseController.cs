@@ -29,7 +29,7 @@ public class ExpenseController : ControllerBase
     /// Create a new expense.
     /// </summary>
     [HttpPost]
-    [Authorize(Roles ="Employee")]
+    [Authorize(Policy = "Expenses.Create")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Consumes("multipart/form-data")]
@@ -48,7 +48,7 @@ public class ExpenseController : ControllerBase
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize(Roles = "Employee")]
+    [Authorize(Policy = "Expenses.Edit")]
 
     public async Task<IActionResult> UpdateExpense([FromBody] UpdateExpenseCommand command)
     {
@@ -63,7 +63,8 @@ public class ExpenseController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize(Roles = "Employee")]
+    [Authorize(Policy = "Expenses.Delete")]
+
 
     public async Task<IActionResult> DeleteExpense(int id)
     {
@@ -78,7 +79,8 @@ public class ExpenseController : ControllerBase
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Expenses.View")]
+
 
     public async Task<IActionResult> GetAllExpenses([FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
@@ -112,7 +114,8 @@ public class ExpenseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Expenses.View")]
+
 
     public async Task<IActionResult> GetExpenseById(int id)
     {

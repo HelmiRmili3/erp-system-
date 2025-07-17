@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Backend.Domain.Entities;
-internal class Role
+public class Role
 {
     public int Id { get; set; }
     public required string UserRole { get; set; }

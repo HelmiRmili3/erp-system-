@@ -2,10 +2,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Backend.Application.Common.Interfaces;
 using Backend.Application.Common.Response;
-using Backend.Application.Common.Settings;
 using Backend.Application.Features.Authentication.Dto;
 using Backend.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Infrastructure.Repository.Command.Base
 {
@@ -108,27 +108,48 @@ namespace Backend.Infrastructure.Repository.Command.Base
             if (!passwordValid)
                 return new Response<LoginResultDto>("Invalid email or password");
 
-            // Build base claims
+            // Base claims
             List<Claim> authClaims = new()
     {
         new Claim(ClaimTypes.Email, email),
         new Claim(ClaimTypes.NameIdentifier, user.Id),
-        new Claim(ClaimTypes.GivenName, user.FirstName),
-        new Claim(ClaimTypes.Surname, user.LastName),
+        new Claim(ClaimTypes.GivenName, user.FirstName ?? ""),
+        new Claim(ClaimTypes.Surname, user.LastName ?? ""),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
 
-            // Add user roles as claims
+            // Step 1: Get roles assigned to user (by name)
             var userRoles = await _userManager.GetRolesAsync(user);
-            authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            // Add additional claims if not already present
-            var existingClaims = await _userManager.GetClaimsAsync(user);
-            foreach (var claim in existingClaims)
+            // Add roles to claims
+            foreach (var role in userRoles)
             {
-                if (!authClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
-                    authClaims.Add(claim);
+                authClaims.Add(new Claim(ClaimTypes.Role, role));
             }
+
+            // Step 2: Get matching Role IDs from DB
+            var roleIds = await _context.Roles
+                .Where(r => userRoles.Contains(r.Name!))
+                .Select(r => r.Id)
+                .ToListAsync();
+
+            // Step 3: Fetch permissions linked to those roles
+            var rolePermissions = await _context.RolePermissions
+                .Where(rp => roleIds.Contains(rp.RoleId))
+                .Include(rp => rp.Permission)
+                .Select(rp => rp.Permission.Name)
+                .ToListAsync();
+
+            // Step 4: Also fetch user-specific permissions
+            var userPermissions = await _context.UserPermissions
+                .Where(up => up.UserId == user.Id)
+                .Include(up => up.Permission)
+                .Select(up => up.Permission.Name)
+                .ToListAsync();
+
+            // Step 5: Merge, deduplicate, and add to JWT
+            var allPermissions = rolePermissions.Concat(userPermissions).Distinct();
+            authClaims.AddRange(allPermissions.Select(p => new Claim("Permission", p)));
 
             // Generate tokens
             var accessToken = _jwtTokenService.GenerateAccessToken(authClaims);
@@ -136,21 +157,17 @@ namespace Backend.Infrastructure.Repository.Command.Base
 
             await _context.SaveChangesAsync();
 
-            // Build LoginResultDto
-            var expiresInSeconds = 60 * 60;
-
             var loginResult = new LoginResultDto
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-
                 TokenType = "Bearer",
-                ExpiresIn = expiresInSeconds
+                ExpiresIn = 3600 // 1 hour
             };
-
 
             return new Response<LoginResultDto>(loginResult, "Login successful");
         }
+
 
         public virtual async Task<Response<string>> ChangePasswordAsync(ChangePasswordDataDto request)
         {

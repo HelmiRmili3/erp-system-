@@ -561,9 +561,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Employee"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -603,9 +601,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -664,9 +660,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -960,9 +954,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -990,9 +982,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -1049,9 +1039,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -1081,9 +1069,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -1228,9 +1214,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -1258,9 +1242,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -1317,9 +1299,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -1349,9 +1329,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -1491,9 +1469,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Employee"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -1521,9 +1497,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Employee"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -1580,9 +1554,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -1612,9 +1584,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Employee"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -1642,9 +1612,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -1765,9 +1733,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -1803,9 +1769,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },
@@ -1860,9 +1824,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -1900,9 +1862,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       },

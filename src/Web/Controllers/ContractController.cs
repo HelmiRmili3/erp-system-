@@ -30,7 +30,8 @@ public class ContractController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Contracts.Create")]
+
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> CreateContract([FromForm] CreateContractCommand command)
     {
@@ -45,8 +46,7 @@ public class ContractController : ControllerBase
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
-
+    [Authorize(Policy = "Contracts.Edit")]
     public async Task<IActionResult> UpdateContract([FromBody] UpdateContractCommand command)
     {
         var result = await _sender.Send(command);
@@ -60,7 +60,7 @@ public class ContractController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Contracts.Delete")]
 
     public async Task<IActionResult> DeleteContract(int id)
     {
@@ -75,7 +75,7 @@ public class ContractController : ControllerBase
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Contracts.View")]
 
     public async Task<IActionResult> GetAllContracts([FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
@@ -103,26 +103,13 @@ public class ContractController : ControllerBase
         return Ok(result);
     }
 
-    ///// <summary>
-    ///// Get all contracts for a specific user.
-    ///// </summary>
-    //[HttpGet("user/{userId}")]
-    //[ProducesResponseType(StatusCodes.Status200OK)]
-    //[Produces("application/json")]
-    //public async Task<IActionResult> GetUserContracts(string userId)
-    //{
-    //    var result = await _sender.Send(new GetContractsByUserIdQuery(userId));
-    //    _logger.LogInformation("Fetched contracts for user {UserId}", userId);
-    //    return Ok(result);
-    //}
-
     /// <summary>
     /// Get a contract by its ID.
     /// </summary>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize]
+    [Authorize(Policy = "Contracts.View")]
 
     public async Task<IActionResult> GetContractById(int id)
     {

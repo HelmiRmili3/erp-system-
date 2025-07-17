@@ -18,7 +18,7 @@ public static class Permissions
 
     public static class System
     {
-        public const string CanPurge = nameof(CanPurge); // Results in "CanPurge"
+        public const string CanPurge = nameof(CanPurge);
     }
 
     public static class Absences
@@ -55,10 +55,10 @@ public static class Permissions
 
     public static class Expanses
     {
-        public const string View = "Expanses.View";
-        public const string Create = "Expanses.Create";
-        public const string Edit = "Expanses.Edit";
-        public const string Delete = "Expanses.Delete";
+        public const string View = "Expenses.View";
+        public const string Create = "Expenses.Create";
+        public const string Edit = "Expenses.Edit";
+        public const string Delete = "Expenses.Delete";
     }
 
     public static class Payrolls

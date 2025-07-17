@@ -31,7 +31,7 @@ public class CertificationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Certification.Create")]
     [Consumes("multipart/form-data")]
 
     public async Task<IActionResult> CreateCertification([FromForm] CreateCertificationCommand command)
@@ -47,7 +47,7 @@ public class CertificationController : ControllerBase
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Certifications.Edit")]
 
     public async Task<IActionResult> UpdateCertification([FromBody] UpdateCertificationCommand command)
     {
@@ -62,7 +62,7 @@ public class CertificationController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Certifications.Delete")]
 
     public async Task<IActionResult> DeleteCertification(int id)
     {
@@ -77,7 +77,7 @@ public class CertificationController : ControllerBase
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Certifications.View")]
 
     public async Task<IActionResult> GetAllCertifications([FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
@@ -111,7 +111,7 @@ public class CertificationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/json")]
     [Authorize]
-
+    [Authorize(Policy = "Certifications.View")]
     public async Task<IActionResult> GetCertificationById(int id)
     {
         var result = await _sender.Send(new GetCertificationByIdQuery(id));

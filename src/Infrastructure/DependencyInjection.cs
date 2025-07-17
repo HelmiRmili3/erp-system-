@@ -161,6 +161,17 @@ public static class DependencyInjection
         builder.Services.AddTransient<IPayrollQueryRepository, PayrollQueryRepository>();
 
         builder.Services.AddAuthorization(options =>
-            options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
+        {
+            // Static role-based policy
+            options.AddPolicy(Policies.CanPurge, policy =>
+                policy.RequireRole(Roles.Administrator));
+
+            // Dynamically add all permission-based policies
+            foreach (var permission in Permissions.All)
+            {
+                options.AddPolicy(permission, policy =>
+                    policy.RequireClaim("Permission", permission));
+            }
+        });
     }
 }
