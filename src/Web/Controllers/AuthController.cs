@@ -39,17 +39,19 @@ public class AuthController : ControllerBase
         var result = await _sender.Send(command);
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
+
+
+
     [HttpPost("refresh")]
     [Produces("application/json")]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenCommand command)
     {
         var result = await _sender.Send(command);
-
-        if (!result.Succeeded)
-            return BadRequest(new { result.Message, result.Errors });
-
-        return Ok(result);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
+
+
+
     [HttpPost("change-password")]
     [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
@@ -68,12 +70,7 @@ public class AuthController : ControllerBase
 
         var command = new ChangePasswordCommand(dataWithId);
         var result = await _sender.Send(command);
-        Console.WriteLine($"Succeeded: {result.Succeeded}, Message: {result.Message}");
-
-        if (!result.Succeeded)
-            return BadRequest(new { Message = result.Message, Errors = result.Errors });
-
-        return Ok(result);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
 
     }
 
@@ -81,9 +78,7 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Me()
     {
-        // This works because "nameid" is ClaimTypes.NameIdentifier
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
         if (string.IsNullOrEmpty(userId))
             return Unauthorized(new { Message = "User ID not found in token." });
 

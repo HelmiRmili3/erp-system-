@@ -79,5 +79,13 @@ namespace Backend.Web.Controllers
             var result = await _sender.Send(new GetRolesWithPermissionsQuery());
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var result = await _sender.Send(new GetUsersQuery());
+            return result.Succeeded ? Ok(result) : BadRequest(result);
+        }
+
     }
+
 }

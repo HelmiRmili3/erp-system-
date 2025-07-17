@@ -526,6 +526,34 @@
         ]
       }
     },
+    "/api/Admin/users": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_GetUsers",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Administrator"
+            ]
+          }
+        ]
+      }
+    },
     "/api/Attendances/mark": {
       "post": {
         "tags": [
