@@ -3,17 +3,19 @@ using Backend.Application.Common.Response;
 using Backend.Application.Features.Certifications.Dto;
 using Backend.Application.Common.Interfaces;
 using Backend.Application.Common.Extensions;
+using Backend.Application.Common.Parameters;
 
 namespace Backend.Application.Features.Certifications.Queries;
 
 public record GetAllCertificationsQuery(
+    PagingParameter PagingParameter,
     string? UserId = null,
     int? Day = null,
     int? Month = null,
     int? Year = null
-) : IRequest<Response<List<CertificationDto>>>;
+) : IRequest<PagedResponse<List<CertificationDto>>>;
 
-public class GetAllCertificationsQueryHandler : IRequestHandler<GetAllCertificationsQuery, Response<List<CertificationDto>>>
+public class GetAllCertificationsQueryHandler : IRequestHandler<GetAllCertificationsQuery, PagedResponse<List<CertificationDto>>>
 {
     private readonly IQueryRepository<Certification> _repository;
 
@@ -22,7 +24,7 @@ public class GetAllCertificationsQueryHandler : IRequestHandler<GetAllCertificat
         _repository = repository;
     }
 
-    public async Task<Response<List<CertificationDto>>> Handle(GetAllCertificationsQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResponse<List<CertificationDto>>> Handle(GetAllCertificationsQuery request, CancellationToken cancellationToken)
     {
         Expression<Func<Certification, bool>> filter = c => true;
 
@@ -46,11 +48,26 @@ public class GetAllCertificationsQueryHandler : IRequestHandler<GetAllCertificat
             filter = filter.AndAlso(c => c.DateObtained.Day == request.Day.Value);
         }
 
-        var entities = await _repository.GetAllByFilterAsync(filter, includeTable: null, cancellationToken);
+        var pagedResult = await _repository.GetPagedAsync(
+                  filter: filter,
+                  pageNumber: request.PagingParameter.PageNumber,
+                  pageSize: request.PagingParameter.PageSize,
+                  includeTable: null,
+                  cancellationToken: cancellationToken
+              );
 
-        var dtos = entities.Select(c => c.ToDto<CertificationDto>()).ToList();
+        var dtoList = pagedResult.Data?.Select(a => a.ToDto<CertificationDto>()).ToList() ?? new List<CertificationDto>();
 
-        return new Response<List<CertificationDto>>(dtos, "Certifications retrieved successfully");
+        return new PagedResponse<List<CertificationDto>>(
+            data: dtoList,
+            pageNumber: pagedResult.PageNumber,
+            pageSize: pagedResult.PageSize,
+            recordsCount: new RecordsCount
+            {
+                RecordsFiltered = pagedResult.RecordsFiltered,
+                RecordsTotal = pagedResult.RecordsTotal
+            }
+        );
     }
 }
 

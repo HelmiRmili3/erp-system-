@@ -12,6 +12,26 @@
           "Absence"
         ],
         "operationId": "Absence_GetAbsences",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -200,6 +220,24 @@
         "operationId": "Absence_GetMyAbsences",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "month",
             "in": "query",
             "schema": {
@@ -207,7 +245,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "year",
@@ -217,7 +255,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           }
         ],
         "responses": {
@@ -448,6 +486,26 @@
           "Admin"
         ],
         "operationId": "Admin_GetPermissions",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -476,6 +534,26 @@
           "Admin"
         ],
         "operationId": "Admin_GetRoles",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -504,6 +582,26 @@
           "Admin"
         ],
         "operationId": "Admin_GetRolesPermissions",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -532,6 +630,26 @@
           "Admin"
         ],
         "operationId": "Admin_GetUsers",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -642,13 +760,31 @@
         "operationId": "Attendance_GetAllAttendances",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "userId",
             "in": "query",
             "schema": {
               "type": "string",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "day",
@@ -658,7 +794,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           },
           {
             "name": "month",
@@ -668,7 +804,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 3
+            "x-position": 5
           },
           {
             "name": "year",
@@ -678,7 +814,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 4
+            "x-position": 6
           }
         ],
         "responses": {
@@ -701,6 +837,24 @@
         "operationId": "Attendance_GetMyAttendances",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "day",
             "in": "query",
             "schema": {
@@ -708,7 +862,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "month",
@@ -718,7 +872,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           },
           {
             "name": "year",
@@ -728,7 +882,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 3
+            "x-position": 5
           }
         ],
         "responses": {
@@ -1021,13 +1175,31 @@
         "operationId": "Certification_GetAllCertifications",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "userId",
             "in": "query",
             "schema": {
               "type": "string",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "day",
@@ -1037,7 +1209,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           },
           {
             "name": "month",
@@ -1047,7 +1219,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 3
+            "x-position": 5
           },
           {
             "name": "year",
@@ -1057,7 +1229,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 4
+            "x-position": 6
           }
         ],
         "responses": {
@@ -1138,6 +1310,24 @@
         "operationId": "Certification_GetMyCertifications",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "day",
             "in": "query",
             "schema": {
@@ -1145,7 +1335,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "month",
@@ -1155,7 +1345,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           },
           {
             "name": "year",
@@ -1165,7 +1355,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 3
+            "x-position": 5
           }
         ],
         "responses": {
@@ -1281,13 +1471,31 @@
         "operationId": "Contract_GetAllContracts",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "userId",
             "in": "query",
             "schema": {
               "type": "string",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "day",
@@ -1297,7 +1505,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           },
           {
             "name": "month",
@@ -1307,7 +1515,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 3
+            "x-position": 5
           },
           {
             "name": "year",
@@ -1317,7 +1525,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 4
+            "x-position": 6
           }
         ],
         "responses": {
@@ -1398,6 +1606,24 @@
         "operationId": "Contract_GetMyContracts",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "day",
             "in": "query",
             "schema": {
@@ -1405,7 +1631,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "month",
@@ -1415,7 +1641,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           },
           {
             "name": "year",
@@ -1425,7 +1651,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 3
+            "x-position": 5
           }
         ],
         "responses": {
@@ -1536,13 +1762,31 @@
         "operationId": "Expense_GetAllExpenses",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "userId",
             "in": "query",
             "schema": {
               "type": "string",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "day",
@@ -1552,7 +1796,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           },
           {
             "name": "month",
@@ -1562,7 +1806,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 3
+            "x-position": 5
           },
           {
             "name": "year",
@@ -1572,7 +1816,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 4
+            "x-position": 6
           }
         ],
         "responses": {
@@ -1653,6 +1897,24 @@
         "operationId": "Expense_GetMyExpenses",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "day",
             "in": "query",
             "schema": {
@@ -1660,7 +1922,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "month",
@@ -1670,7 +1932,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           },
           {
             "name": "year",
@@ -1680,7 +1942,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 3
+            "x-position": 5
           }
         ],
         "responses": {
@@ -1808,13 +2070,31 @@
         "operationId": "Payroll_GetAllPayrolls",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "userId",
             "in": "query",
             "schema": {
               "type": "string",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "month",
@@ -1824,7 +2104,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           },
           {
             "name": "year",
@@ -1834,7 +2114,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 3
+            "x-position": 5
           }
         ],
         "responses": {
@@ -1939,6 +2219,24 @@
         "operationId": "Payroll_GetMyPayrolls",
         "parameters": [
           {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
             "name": "month",
             "in": "query",
             "schema": {
@@ -1946,7 +2244,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 1
+            "x-position": 3
           },
           {
             "name": "year",
@@ -1956,7 +2254,7 @@
               "format": "int32",
               "nullable": true
             },
-            "x-position": 2
+            "x-position": 4
           }
         ],
         "responses": {

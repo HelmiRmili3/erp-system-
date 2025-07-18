@@ -3,23 +3,20 @@ using Backend.Application.Common.Response;
 using Backend.Application.Features.Contracts.Dtos;
 using Backend.Application.Common.Interfaces;
 using Backend.Application.Common.Extensions;
-using Backend.Domain.Entities;
-using MediatR;
+using Backend.Application.Common.Parameters;
 using Backend.Application.Features.Certifications.Queries;
 
 namespace Backend.Application.Features.Contracts.Queries;
 
-/// <summary>
-/// Query to get all contracts optionally filtered by user and date.
-/// </summary>
 public record GetAllContractsQuery(
+    PagingParameter PagingParameter,
     string? UserId = null,
     int? Day = null,
     int? Month = null,
     int? Year = null
-) : IRequest<Response<List<ContractDto>>>;
+) : IRequest<PagedResponse<List<ContractDto>>>;
 
-public class GetAllContractsQueryHandler : IRequestHandler<GetAllContractsQuery, Response<List<ContractDto>>>
+public class GetAllContractsQueryHandler : IRequestHandler<GetAllContractsQuery, PagedResponse<List<ContractDto>>>
 {
     private readonly IQueryRepository<Contract> _repository;
 
@@ -28,7 +25,7 @@ public class GetAllContractsQueryHandler : IRequestHandler<GetAllContractsQuery,
         _repository = repository;
     }
 
-    public async Task<Response<List<ContractDto>>> Handle(GetAllContractsQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResponse<List<ContractDto>>> Handle(GetAllContractsQuery request, CancellationToken cancellationToken)
     {
         Expression<Func<Contract, bool>> filter = c => true;
 
@@ -52,12 +49,29 @@ public class GetAllContractsQueryHandler : IRequestHandler<GetAllContractsQuery,
             filter = filter.AndAlso(c => c.StartDate.Day == request.Day.Value);
         }
 
-        var contracts = await _repository.GetAllByFilterAsync(filter, includeTable: null, cancellationToken);
-        var dtos = contracts.Select(c => c.ToDto<ContractDto>()).ToList();
+        var pagedResult = await _repository.GetPagedAsync(
+            filter,
+            request.PagingParameter.PageNumber,
+            request.PagingParameter.PageSize,
+            includeTable: null,
+            cancellationToken
+        );
 
-        return new Response<List<ContractDto>>(dtos, "Contracts retrieved successfully.");
+        var dtoList = pagedResult.Data?.Select(a => a.ToDto<ContractDto>()).ToList() ?? new List<ContractDto>();
+
+        return new PagedResponse<List<ContractDto>>(
+            data: dtoList,
+            pageNumber: request.PagingParameter.PageNumber,
+            pageSize: request.PagingParameter.PageSize,
+            recordsCount: new RecordsCount
+            {
+                RecordsFiltered = pagedResult.RecordsFiltered,
+                RecordsTotal = pagedResult.RecordsTotal
+            }
+        );
     }
 }
+
 public class GetAllContractsQueryValidator : AbstractValidator<GetAllContractsQuery>
 {
     public GetAllContractsQueryValidator()

@@ -1,13 +1,13 @@
-﻿using Backend.Application.Common.Response;
+﻿using Backend.Application.Common.Parameters;
+using Backend.Application.Common.Response;
 using Backend.Application.Features.Admin.Dto;
 using Backend.Application.Features.Admin.IRepositories;
-using MediatR;
 
 namespace Backend.Application.Features.Admin.Queries;
 
-public record GetUsersQuery : IRequest<Response<List<UserDto>>>;
+public record GetUsersQuery(PagingParameter Paging) : IRequest<PagedResponse<List<UserDto>>>;
 
-public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, Response<List<UserDto>>>
+public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, PagedResponse<List<UserDto>>>
 {
     private readonly IAdminQueryRepository _repository;
 
@@ -16,8 +16,11 @@ public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, Response<List
         _repository = repository;
     }
 
-    public async Task<Response<List<UserDto>>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResponse<List<UserDto>>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
-        return await _repository.GetUsersWithRolesAndPermissionsAsync(cancellationToken);
+        return await _repository.GetUsersWithRolesAndPermissionsAsync(
+            request.Paging.PageNumber,
+            request.Paging.PageSize,
+            cancellationToken);
     }
 }

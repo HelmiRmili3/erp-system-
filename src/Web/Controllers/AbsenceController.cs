@@ -1,4 +1,5 @@
-﻿using Backend.Application.Features.Absences.Commands;
+﻿using Backend.Application.Common.Parameters;
+using Backend.Application.Features.Absences.Commands;
 using Backend.Application.Features.Absences.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,9 +22,9 @@ public class AbsenceController : ControllerBase
     // GET: api/absence
     [HttpGet]
     [Authorize(Policy = "Absences.View")]
-    public async Task<IActionResult> GetAbsences()
+    public async Task<IActionResult> GetAbsences([FromQuery] PagingParameter paging)
     {
-        var result = await _sender.Send(new GetAbsencesQuery());
+        var result = await _sender.Send(new GetAbsencesQuery(paging));
         _logger.LogInformation("Retrieved all absences successfully.");
         return Ok(result);
     }
@@ -77,9 +78,9 @@ public class AbsenceController : ControllerBase
     // GET: api/absence/my
     [Authorize(Roles = "Employee", Policy = "Absences.View")]
     [HttpGet("me")]
-    public async Task<IActionResult> GetMyAbsences([FromQuery] int? month, [FromQuery] int? year)
+    public async Task<IActionResult> GetMyAbsences([FromQuery] PagingParameter paging,[FromQuery] int? month, [FromQuery] int? year)
     {
-        var query = new GetEmployeeAbsencesByIdQuery(month, year);
+        var query = new GetEmployeeAbsencesByIdQuery(paging,month, year);
         var result = await _sender.Send(query);
         _logger.LogInformation("Retrieved absences for current user with filters - Month: {Month}, Year: {Year}", month, year);
         return Ok(result);

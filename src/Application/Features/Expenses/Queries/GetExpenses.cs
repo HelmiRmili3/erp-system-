@@ -1,28 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using Backend.Application.Common.Interfaces;
 using Backend.Application.Common.Response;
-using Backend.Application.Common.Extensions;
 using Backend.Application.Features.Expenses.Dtos;
-using Backend.Domain.Entities;
-using FluentValidation;
-using MediatR;
+
 using Backend.Application.Features.Certifications.Queries;
+using Backend.Application.Common.Parameters;
+using Backend.Application.Features.Certifications.Dto;
+using Backend.Application.Common.Extensions;
 
 namespace Backend.Application.Features.Expenses.Queries
 {
     public record GetAllExpensesQuery(
+        PagingParameter PagingParameter,
         string? UserId = null,
         int? Day = null,
         int? Month = null,
         int? Year = null
-    ) : IRequest<Response<List<ExpenseDto>>>;
+    ) : IRequest<PagedResponse<List<ExpenseDto>>>;
 
-    public class GetAllExpensesQueryHandler : IRequestHandler<GetAllExpensesQuery, Response<List<ExpenseDto>>>
+    public class GetAllExpensesQueryHandler : IRequestHandler<GetAllExpensesQuery, PagedResponse<List<ExpenseDto>>>
     {
         private readonly IQueryRepository<Expense> _queryRepository;
         private readonly ICommandRepository<Expense> _commandRepository; // Included but not used here
@@ -35,7 +31,7 @@ namespace Backend.Application.Features.Expenses.Queries
             _commandRepository = commandRepository;
         }
 
-        public async Task<Response<List<ExpenseDto>>> Handle(GetAllExpensesQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResponse<List<ExpenseDto>>> Handle(GetAllExpensesQuery request, CancellationToken cancellationToken)
         {
             Expression<Func<Expense, bool>> filter = e => true;
 
@@ -51,20 +47,26 @@ namespace Backend.Application.Features.Expenses.Queries
             if (request.Day.HasValue)
                 filter = filter.AndAlso(e => e.ExpenseDate.Day == request.Day.Value);
 
-            var expenses = await _queryRepository.GetAllByFilterAsync(filter, includeTable: null, cancellationToken);
+            var pagedResult = await _queryRepository.GetPagedAsync(
+                  filter: filter,
+                  pageNumber: request.PagingParameter.PageNumber,
+                  pageSize: request.PagingParameter.PageSize,
+                  includeTable: null,
+                  cancellationToken: cancellationToken
+              );
 
-            var dtos = expenses.Select(e => new ExpenseDto
-            {
-                Id = e.Id,
-                UserId = e.UserId,
-                Description = e.Description,
-                Amount = e.Amount,
-                ExpenseDate = e.ExpenseDate,
-                Category = e.Category,
-                Status = e.Status,
-            }).ToList();
+            var dtoList = pagedResult.Data?.Select(a => a.ToDto<ExpenseDto>()).ToList() ?? new List<ExpenseDto>();
 
-            return new Response<List<ExpenseDto>>(dtos, "Expenses retrieved successfully.");
+            return new PagedResponse<List<ExpenseDto>>(
+                data: dtoList,
+                pageNumber: pagedResult.PageNumber,
+                pageSize: pagedResult.PageSize,
+                recordsCount: new RecordsCount
+                {
+                    RecordsFiltered = pagedResult.RecordsFiltered,
+                    RecordsTotal = pagedResult.RecordsTotal
+                }
+            );
         }
     }
 

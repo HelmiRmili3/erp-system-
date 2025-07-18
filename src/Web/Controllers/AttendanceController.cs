@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
+using Backend.Application.Common.Parameters;
 using Backend.Application.Features.Attendances.Commands;
-using Backend.Application.Features.Attendances.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -65,9 +65,9 @@ public class AttendanceController : ControllerBase
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize(Policy = "Attendances.View")]
-    public async Task<IActionResult> GetAllAttendances([FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
+    public async Task<IActionResult> GetAllAttendances([FromQuery] PagingParameter paging,[FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
-        var result = await _sender.Send(new GetAllAttendancesQuery(userId,day, month, year));
+        var result = await _sender.Send(new GetAllAttendancesQuery(paging,userId, day, month, year));
         _logger.LogInformation("Fetched all attendances with filters - UserId: {UserId},Day: {Day}, Month: {Month}, Year: {Year}",userId, day, month, year);
         return Ok(result);
     }
@@ -81,14 +81,14 @@ public class AttendanceController : ControllerBase
     [Authorize]
     [HttpGet("me")]
     [Authorize(Roles = "Employee")]
-    public async Task<IActionResult> GetMyAttendances([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
+    public async Task<IActionResult> GetMyAttendances([FromQuery] PagingParameter paging,[FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (string.IsNullOrEmpty(userId))
             return Unauthorized(new { Message = "User ID not found in token." });
 
-        var result = await _sender.Send(new GetUserAttendancesQuery(userId, day, month, year));
+        var result = await _sender.Send(new GetAllAttendancesQuery(paging,userId, day, month, year));
         _logger.LogInformation("Fetched attendance for current user {UserId} with Day:{Day} Month: {Month}, Year: {Year}", userId, day, month, year);
         return Ok(result);
     }

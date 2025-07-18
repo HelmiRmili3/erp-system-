@@ -4,6 +4,8 @@ using Backend.Application.Features.Admin.IRepositories;
 using Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Backend.Application.Common.Parameters;
+using Backend.Application.Common.Models;
 
 namespace Backend.Application.Features.Admin.Repositories;
 
@@ -17,19 +19,39 @@ public class AdminQueryRepository : IAdminQueryRepository
         _context = context;
         _userManager = userManager;
     }
-    public async Task<Response<List<PermissionDto>>> GetPermissionsAsync(CancellationToken cancellationToken = default)
+    public async Task<PagedResponse<List<PermissionDto>>> GetPermissionsWithPaginationAsync(
+     int pageNumber,
+     int pageSize,
+     CancellationToken cancellationToken)
     {
-        var permissions = await _context.Permissions
+        var source = _context.Permissions
+            .OrderBy(p => p.Id)
             .Select(p => new PermissionDto
             {
                 Id = p.Id,
                 Name = p.Name,
                 Description = p.Description
-            })
-            .ToListAsync(cancellationToken);
+            });
 
-        return new Response<List<PermissionDto>>(permissions);
+        var totalRecords = await source.CountAsync(cancellationToken);
+        var items = await source
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+        var recordsCount = new RecordsCount
+        {
+            RecordsFiltered = totalRecords,
+            RecordsTotal = totalRecords
+        };
+        return new PagedResponse<List<PermissionDto>>(
+            items,
+            pageNumber,
+            pageSize,
+            recordsCount
+        );
     }
+
+
 
     public async Task<Response<PermissionDto>> GetPermissionByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -49,17 +71,30 @@ public class AdminQueryRepository : IAdminQueryRepository
         return new Response<PermissionDto>(permission);
     }
 
-    public async Task<Response<List<RoleDto>>> GetRolesAsync(CancellationToken cancellationToken = default)
+    public async Task<PagedResponse<List<RoleDto>>> GetRolesAsync(
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
     {
-        var roles = await _context.ApplicationRoles
+        var query = _context.ApplicationRoles
             .Select(r => new RoleDto
             {
                 Id = r.Id,
                 Name = r.Name!
-            })
-            .ToListAsync(cancellationToken);
+            });
 
-        return new Response<List<RoleDto>>(roles);
+        var totalRecords = await query.CountAsync(cancellationToken);
+
+        var roles = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+        var recordsCount = new RecordsCount
+        {
+            RecordsFiltered = totalRecords,
+            RecordsTotal = totalRecords
+        };
+        return new PagedResponse<List<RoleDto>>(roles, pageNumber, pageSize, recordsCount);
     }
 
     public async Task<Response<RoleDto>> GetRoleByIdAsync(string roleId, CancellationToken cancellationToken = default)
@@ -79,9 +114,12 @@ public class AdminQueryRepository : IAdminQueryRepository
         return new Response<RoleDto>(role);
     }
 
-    public async Task<Response<List<RoleWithPermissionsDto>>> GetRolesWithPermissionsAsync(CancellationToken cancellationToken = default)
+    public async Task<PagedResponse<List<RoleWithPermissionsDto>>> GetRolesWithPermissionsAsync(
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
     {
-        var rolesWithPermissions = await _context.ApplicationRoles
+        var source = _context.ApplicationRoles
             .Include(r => r.RolePermissions)
                 .ThenInclude(rp => rp.Permission)
             .Select(r => new RoleWithPermissionsDto
@@ -94,35 +132,53 @@ public class AdminQueryRepository : IAdminQueryRepository
                     Name = rp.Permission.Name,
                     Description = rp.Permission.Description
                 }).ToList()
-            })
+            });
+
+        var totalRecords = await source.CountAsync(cancellationToken);
+        var items = await source
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return new Response<List<RoleWithPermissionsDto>>(rolesWithPermissions);
+        var recordsCount = new RecordsCount
+        {
+            RecordsFiltered = totalRecords,
+            RecordsTotal = totalRecords
+        };
+
+        return new PagedResponse<List<RoleWithPermissionsDto>>(
+            items,
+            pageNumber,
+            pageSize,
+            recordsCount
+        );
     }
-    public async Task<Response<List<UserDto>>> GetUsersWithRolesAndPermissionsAsync(CancellationToken cancellationToken)
+    public async Task<PagedResponse<List<UserDto>>> GetUsersWithRolesAndPermissionsAsync(
+    int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
+        var totalRecords = await _context.Users.CountAsync(cancellationToken);
+
         var users = await _context.Users
             .Include(u => u.UserPermissions)
                 .ThenInclude(up => up.Permission)
             .Include(u => u.Supervisor)
+            .OrderBy(u => u.LastName) 
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
 
         var userIds = users.Select(u => u.Id).ToList();
 
-        // Get user roles
         var userRoles = await _context.UserRoles
             .Where(ur => userIds.Contains(ur.UserId))
             .ToListAsync(cancellationToken);
 
-        // Get all role IDs used by users
         var roleIds = userRoles.Select(ur => ur.RoleId).Distinct().ToList();
 
-        // Load roles with their names
         var roles = await _context.ApplicationRoles
             .Where(r => roleIds.Contains(r.Id))
             .ToListAsync(cancellationToken);
 
-        // Get role permissions (optional, you already have this)
         var rolePermissions = await _context.RolePermissions
             .Where(rp => roleIds.Contains(rp.RoleId))
             .Include(rp => rp.Permission)
@@ -135,7 +191,6 @@ public class AdminQueryRepository : IAdminQueryRepository
                 .Select(ur => ur.RoleId)
                 .ToList();
 
-            // Map role IDs to role names
             var rolesForUserNames = roles
                 .Where(r => rolesForUserIds.Contains(r.Id))
                 .Select(r => r.Name!)
@@ -170,12 +225,20 @@ public class AdminQueryRepository : IAdminQueryRepository
                 UpdatedBy = u.UpdatedBy ?? "",
                 SupervisorId = u.SupervisorId ?? "",
                 SupervisorFullName = u.Supervisor != null ? $"{u.Supervisor.FirstName} {u.Supervisor.LastName}" : "",
-                Roles = rolesForUserNames,    // **HERE: role names instead of role IDs**
+                Roles = rolesForUserNames,
                 Permissions = allPermissions
             };
         }).ToList();
 
-        return new Response<List<UserDto>>(userDtos);
+        // Use your RecordsCount type (replace with your actual implementation)
+        var recordsCount = new RecordsCount
+        {
+            RecordsFiltered = totalRecords,
+            RecordsTotal = totalRecords
+        };
+
+        return new PagedResponse<List<UserDto>>(userDtos, pageNumber, pageSize, recordsCount);
     }
 
+   
 }

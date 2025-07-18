@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Backend.Application.Common.Parameters;
 using Backend.Application.Features.Contracts.Commands;
 using Backend.Application.Features.Contracts.Queries;
 using MediatR;
@@ -77,9 +78,9 @@ public class ContractController : ControllerBase
     [Produces("application/json")]
     [Authorize(Policy = "Contracts.View")]
 
-    public async Task<IActionResult> GetAllContracts([FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
+    public async Task<IActionResult> GetAllContracts([FromQuery] PagingParameter paging,[FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
-        var result = await _sender.Send(new GetAllContractsQuery(userId, day, month, year));
+        var result = await _sender.Send(new GetAllContractsQuery(paging,userId, day, month, year));
         _logger.LogInformation("Fetched contracts with filters - UserId: {UserId}, Day: {Day}, Month: {Month}, Year: {Year}", userId, day, month, year);
         return Ok(result);
     }
@@ -92,13 +93,13 @@ public class ContractController : ControllerBase
     [Produces("application/json")]
     [Authorize(Roles = "Employee")]
 
-    public async Task<IActionResult> GetMyContracts([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
+    public async Task<IActionResult> GetMyContracts([FromQuery] PagingParameter paging,[FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return Unauthorized(new { Message = "User ID not found in token." });
 
-        var result = await _sender.Send(new GetAllContractsQuery(userId, day, month, year));
+        var result = await _sender.Send(new GetAllContractsQuery(paging,userId, day, month, year));
         _logger.LogInformation("Fetched contracts for current user {UserId}", userId);
         return Ok(result);
     }

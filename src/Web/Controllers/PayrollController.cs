@@ -1,4 +1,5 @@
-﻿using Backend.Application.Features.Payrolls.Commands;
+﻿using Backend.Application.Common.Parameters;
+using Backend.Application.Features.Payrolls.Commands;
 using Backend.Application.Features.Payrolls.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -69,11 +70,12 @@ public class PayrollController : ControllerBase
 
 
     public async Task<IActionResult> GetAllPayrolls(
+       [FromQuery] PagingParameter paging,
        [FromQuery] string? userId,
        [FromQuery] int? month = null,
        [FromQuery] int? year = null)
     {
-        var query = new GetAllPayrollsQuery(userId, month, year);
+        var query = new GetAllPayrollsQuery(paging,userId, month, year);
         var result = await _sender.Send(query);
 
         _logger.LogInformation("Fetched payrolls - UserId: {UserId}, Month: {Month}, Year: {Year}",
@@ -102,6 +104,7 @@ public class PayrollController : ControllerBase
     [Authorize(Roles = "Employee")]
 
     public async Task<IActionResult> GetMyPayrolls(
+    [FromQuery] PagingParameter paging,
      [FromQuery] int? month = null,
      [FromQuery] int? year = null)
     {
@@ -110,7 +113,7 @@ public class PayrollController : ControllerBase
         if (string.IsNullOrEmpty(userId))
             return Unauthorized(new { Message = "User ID not found in token." });
 
-        var query = new GetAllPayrollsQuery(userId,month, year);
+        var query = new GetAllPayrollsQuery(paging,userId, month, year);
 
         var result = await _sender.Send(query);
 

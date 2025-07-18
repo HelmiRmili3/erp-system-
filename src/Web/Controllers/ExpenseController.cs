@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Backend.Application.Common.Parameters;
 using Backend.Application.Features.Expenses.Commands;
 using Backend.Application.Features.Expenses.Dtos;
 using Backend.Application.Features.Expenses.Queries;
@@ -82,9 +83,9 @@ public class ExpenseController : ControllerBase
     [Authorize(Policy = "Expenses.View")]
 
 
-    public async Task<IActionResult> GetAllExpenses([FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
+    public async Task<IActionResult> GetAllExpenses([FromQuery] PagingParameter paging, [FromQuery] string? userId, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
-        var result = await _sender.Send(new GetAllExpensesQuery(userId, day, month, year));
+        var result = await _sender.Send(new GetAllExpensesQuery(paging,userId, day, month, year));
         _logger.LogInformation("Fetched expenses with filters - UserId: {UserId}, Day: {Day}, Month: {Month}, Year: {Year}", userId, day, month, year);
         return Ok(result);
     }
@@ -97,13 +98,13 @@ public class ExpenseController : ControllerBase
     [Produces("application/json")]
     [Authorize(Roles = "Employee")]
 
-    public async Task<IActionResult> GetMyExpenses([FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
+    public async Task<IActionResult> GetMyExpenses([FromQuery] PagingParameter paging, [FromQuery] int? day, [FromQuery] int? month, [FromQuery] int? year)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return Unauthorized(new { Message = "User ID not found in token." });
 
-        var result = await _sender.Send(new GetAllExpensesQuery(userId, day, month, year));
+        var result = await _sender.Send(new GetAllExpensesQuery(paging, userId, day, month, year));
         _logger.LogInformation("Fetched expenses for current user {UserId}", userId);
         return Ok(result);
     }

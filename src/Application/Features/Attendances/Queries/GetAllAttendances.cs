@@ -1,17 +1,18 @@
 ﻿using Backend.Application.Common.Extensions;
+using Backend.Application.Common.Parameters;
 using Backend.Application.Common.Response;
 using Backend.Application.Features.Attendances.Dto;
 using System.Linq.Expressions;
 
-/// <summary>
-/// Query to get all attendances, optionally filtered by day/month/year.
-/// </summary>
-public record GetAllAttendancesQuery(string? UserId, int? Day, int? Month, int? Year) : IRequest<Response<List<AttendanceDto>>>;
+public record GetAllAttendancesQuery(
+    PagingParameter PagingParameter,
+    string? UserId,
+    int? Day,
+    int? Month,
+    int? Year
+) : IRequest<PagedResponse<List<AttendanceDto>>>;
 
-/// <summary>
-/// Handler for GetAllAttendancesQuery.
-/// </summary>
-public class GetAllAttendancesQueryHandler : IRequestHandler<GetAllAttendancesQuery, Response<List<AttendanceDto>>>
+public class GetAllAttendancesQueryHandler : IRequestHandler<GetAllAttendancesQuery, PagedResponse<List<AttendanceDto>>>
 {
     private readonly IAttendanceQueryRepository _repository;
 
@@ -20,52 +21,49 @@ public class GetAllAttendancesQueryHandler : IRequestHandler<GetAllAttendancesQu
         _repository = repository;
     }
 
-    public async Task<Response<List<AttendanceDto>>> Handle(GetAllAttendancesQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResponse<List<AttendanceDto>>> Handle(GetAllAttendancesQuery request, CancellationToken cancellationToken)
     {
         Expression<Func<Attendance, bool>> filter = a => true;
 
         if (!string.IsNullOrWhiteSpace(request.UserId))
-        {
-            var userId = request.UserId;
-            filter = Combine(filter, a => a.UserId == userId);
-        }
+            filter = Combine(filter, a => a.UserId == request.UserId);
 
         if (request.Day.HasValue)
-        {
-            var day = request.Day.Value;
-            filter = Combine(filter, a => a.AttendanceDay.Day == day);
-        }
+            filter = Combine(filter, a => a.AttendanceDay.Day == request.Day.Value);
 
         if (request.Month.HasValue)
-        {
-            var month = request.Month.Value;
-            filter = Combine(filter, a => a.AttendanceDay.Month == month);
-        }
+            filter = Combine(filter, a => a.AttendanceDay.Month == request.Month.Value);
 
         if (request.Year.HasValue)
-        {
-            var year = request.Year.Value;
-            filter = Combine(filter, a => a.AttendanceDay.Year == year);
-        }
+            filter = Combine(filter, a => a.AttendanceDay.Year == request.Year.Value);
 
-        var attendances = await _repository.GetAllByFilterAsync(filter, null, cancellationToken);
-        var dtos = attendances.Select(a => a.ToDto<AttendanceDto>()).ToList();
+        // Fetch paged results
+        var pagedResult = await _repository.GetPagedAsync(
+            filter: filter,
+            pageNumber: request.PagingParameter.PageNumber,
+            pageSize: request.PagingParameter.PageSize,
+            includeTable: null,
+            cancellationToken: cancellationToken
+        );
 
-        return new Response<List<AttendanceDto>>(dtos, "Attendances fetched successfully.");
+        var dtoList = pagedResult.Data?.Select(a => a.ToDto<AttendanceDto>()).ToList() ?? new List<AttendanceDto>();
+
+        return new PagedResponse<List<AttendanceDto>>(
+            data: dtoList,
+            pageNumber: pagedResult.PageNumber,
+            pageSize: pagedResult.PageSize,
+            recordsCount: new RecordsCount
+            {
+                RecordsFiltered = pagedResult.RecordsFiltered,
+                RecordsTotal = pagedResult.RecordsTotal
+            }
+        );
     }
 
-    /// <summary>
-    /// Combines two expressions with logical AND.
-    /// </summary>
     private static Expression<Func<T, bool>> Combine<T>(Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
     {
         var param = Expression.Parameter(typeof(T));
-
-        var body = Expression.AndAlso(
-            Expression.Invoke(first, param),
-            Expression.Invoke(second, param)
-        );
-
+        var body = Expression.AndAlso(Expression.Invoke(first, param), Expression.Invoke(second, param));
         return Expression.Lambda<Func<T, bool>>(body, param);
     }
 }
@@ -93,3 +91,4 @@ public class GetAllAttendancesQueryValidator : AbstractValidator<GetAllAttendanc
             .WithMessage("Year must be valid.");
     }
 }
+

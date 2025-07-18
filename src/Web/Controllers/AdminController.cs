@@ -1,4 +1,5 @@
-﻿using Backend.Application.Features.Admin.Commands;
+﻿using Backend.Application.Common.Parameters;
+using Backend.Application.Features.Admin.Commands;
 using Backend.Application.Features.Admin.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,32 +60,34 @@ namespace Backend.Web.Controllers
         // ----- Queries -----
 
         [HttpGet("permissions")]
-        public async Task<IActionResult> GetPermissions()
+        public async Task<IActionResult> GetPermissions([FromQuery] PagingParameter paging)
         {
-            var result = await _sender.Send(new GetPermissionsQuery());
+            var result = await _sender.Send(new GetPermissionsQuery(paging));
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
+
         [HttpGet("roles")]
-        public async Task<IActionResult> GetRoles()
+        public async Task<IActionResult> GetRoles([FromQuery] PagingParameter paging)
         {
-            var result = await _sender.Send(new GetRolesQuery());
+            var result = await _sender.Send(new GetRolesQuery(paging));
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
 
         [HttpGet("rolesPermissions")]
-        public async Task<IActionResult> GetRolesPermissions()
+        public async Task<IActionResult> GetRolesPermissions([FromQuery] PagingParameter paging)
         {
-            var result = await _sender.Send(new GetRolesWithPermissionsQuery());
+            var result = await _sender.Send(new GetRolesWithPermissionsQuery(paging));
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
         [HttpGet("users")]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery] PagingParameter paging)
         {
-            var result = await _sender.Send(new GetUsersQuery());
+            var result = await _sender.Send(new GetUsersQuery(paging));
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
+
 
     }
 
