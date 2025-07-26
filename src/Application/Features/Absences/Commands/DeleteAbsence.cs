@@ -1,7 +1,7 @@
-﻿using Backend.Application.Common.Response;
+﻿using System.Security.Claims;
+using Backend.Application.Common.Response;
 using Backend.Application.Features.Absences.IRepositories;
-using FluentValidation;
-using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Backend.Application.Features.Absences.Commands
 {
@@ -11,26 +11,39 @@ namespace Backend.Application.Features.Absences.Commands
     {
         private readonly IAbsenceCommandRepository _commandRepository;
         private readonly IAbsenceQueryRepository _queryRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public DeleteAbsenceCommandHandler(
             IAbsenceCommandRepository commandRepository,
-            IAbsenceQueryRepository queryRepository)
+            IAbsenceQueryRepository queryRepository,
+            IHttpContextAccessor httpContextAccessor
+
+            )
         {
             _commandRepository = commandRepository;
             _queryRepository = queryRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Response<string>> Handle(DeleteAbsenceCommand request, CancellationToken cancellationToken)
         {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                var response = new Response<string>("Absence could not be deleted")
+            .WithError("User is not authenticated.");
+                return response;
+
+            }
             var entity = await _queryRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (entity == null)
                 return new Response<string>("Absence not found");
-
+            if (entity.UserId != userId)
+                return new Response<string>("Failed to delete absence.");
             try
             {
                 await _commandRepository.DeleteAsync(entity, cancellationToken);
-
                 return new Response<string>(request.Id.ToString(), $"Absence with ID {request.Id} deleted successfully.");
 
             }

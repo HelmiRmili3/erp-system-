@@ -136,10 +136,9 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             },
-            "x-position": 1
+            "x-position": 2
           }
         ],
         "requestBody": {
@@ -152,7 +151,7 @@
             }
           },
           "required": true,
-          "x-position": 2
+          "x-position": 1
         },
         "responses": {
           "200": {
@@ -939,7 +938,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/Auth/register": {
@@ -977,9 +981,7 @@
         },
         "security": [
           {
-            "JWT": [
-              "Administrator"
-            ]
+            "JWT": []
           }
         ]
       }
@@ -1014,7 +1016,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/Auth/change-password": {
@@ -2297,9 +2304,6 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "userId": {
-            "type": "string"
-          },
           "startDate": {
             "type": "string",
             "format": "date-time"
@@ -2310,9 +2314,6 @@
           },
           "absenceType": {
             "$ref": "#/components/schemas/AbsenceType"
-          },
-          "statusType": {
-            "$ref": "#/components/schemas/AbsenceStatus"
           },
           "reason": {
             "type": "string",
@@ -2338,22 +2339,6 @@
           4
         ]
       },
-      "AbsenceStatus": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Pending",
-          "Approved",
-          "Rejected",
-          "Cancelled"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3
-        ]
-      },
       "UpdateAbsenceCommand": {
         "allOf": [
           {
@@ -2366,21 +2351,29 @@
         ]
       },
       "AbsenceUpdateDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/AbsenceAddDto"
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
           },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "id": {
-                "type": "integer",
-                "format": "int32"
-              }
-            }
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "absenceType": {
+            "$ref": "#/components/schemas/AbsenceType"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
           }
-        ]
+        }
       },
       "ProblemDetails": {
         "type": "object",

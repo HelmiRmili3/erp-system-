@@ -2,10 +2,8 @@
 using Backend.Application.Common.Parameters;
 using Backend.Application.Features.Certifications.Commands;
 using Backend.Application.Features.Certifications.Queries;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Backend.Web.Controllers;
 

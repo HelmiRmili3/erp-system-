@@ -2,7 +2,6 @@
 using Backend.Application.Common.Interfaces;
 using Backend.Infrastructure.Data;
 using Backend.Web.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using NSwag;
@@ -19,6 +18,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<IUser, CurrentUser>();
 
         builder.Services.AddHttpContextAccessor();
+
         builder.Services.AddHealthChecks()
             .AddDbContextCheck<ApplicationDbContext>();
 
@@ -44,7 +44,9 @@ public static class DependencyInjection
                 Description = "Type into the textbox: Bearer {your JWT token}."
             });
 
-            configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+            //configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+            configure.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT"));
+
         });
     }
 

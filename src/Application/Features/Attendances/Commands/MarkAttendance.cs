@@ -20,7 +20,6 @@ public class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceComman
     public async Task<Response<AttendanceDto>> Handle(MarkAttendanceCommand request, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrEmpty(request.UserId, nameof(request.UserId));
-        // AttendanceDay is DateOnly, no .Date property
         var attendanceDay = DateOnly.FromDateTime(DateTime.Now);
 
         var existingAttendance = await _queryRepository.GetSingleByFilterAsync(

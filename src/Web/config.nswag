@@ -5,10 +5,10 @@
     "aspNetCoreToOpenApi": {
       "project": "Web.csproj",
       "msBuildProjectExtensionsPath": null,
-      "configuration": null,
+      "configuration": "Configuration=Debug",
       "runtime": null,
       "targetFramework": null,
-      "noBuild": true,
+      "noBuild": false,
       "msBuildOutputPath": null,
       "verbose": false,
       "workingDirectory": null,

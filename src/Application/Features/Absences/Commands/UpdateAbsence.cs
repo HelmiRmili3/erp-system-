@@ -1,10 +1,10 @@
-﻿using Backend.Application.Common.Extensions;
+﻿using System.Security.Claims;
+using Backend.Application.Common.Extensions;
 using Backend.Application.Common.Response;
 using Backend.Application.Features.Absences.Dto;
 using Backend.Application.Features.Absences.IRepositories;
-using Backend.Domain.Entities;
-using FluentValidation;
-using MediatR;
+using Microsoft.AspNetCore.Http;
+
 
 namespace Backend.Application.Features.Absences.Commands
 {
@@ -14,27 +14,37 @@ namespace Backend.Application.Features.Absences.Commands
     {
         private readonly IAbsenceCommandRepository _commandRepository;
         private readonly IAbsenceQueryRepository _queryRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
 
         public UpdateAbsenceCommandHandler(
             IAbsenceCommandRepository commandRepository,
-            IAbsenceQueryRepository queryRepository)
+            IAbsenceQueryRepository queryRepository,
+            IHttpContextAccessor httpContextAccessor
+
+            )
         {
             _commandRepository = commandRepository;
             _queryRepository = queryRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Response<AbsenceDto>> Handle(UpdateAbsenceCommand request, CancellationToken cancellationToken)
         {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return new Response<AbsenceDto>("Absence could not be created").WithError("User is not authenticated.");
+
+            }
             var entity = await _queryRepository.GetByIdAsync(request.Id, cancellationToken);
 
-            if (entity == null)
-                return new Response<AbsenceDto>("Absence not found");
-
-            entity.UserId = request.UserId;
+            if (entity == null || entity.UserId != userId)
+                return new Response<AbsenceDto>("Failed to delete absence.");
+        
             entity.StartDate = request.StartDate;
             entity.EndDate = request.EndDate;
             entity.AbsenceType = request.AbsenceType;
-            entity.StatusType = request.StatusType;
             entity.Reason = request.Reason;
 
             await _commandRepository.UpdateAsync(entity, cancellationToken);
@@ -47,12 +57,7 @@ namespace Backend.Application.Features.Absences.Commands
     {
         public UpdateAbsenceCommandValidator()
         {
-            RuleFor(x => x.Id)
-                .GreaterThan(0).WithMessage("Invalid absence ID.");
-
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User ID is required.");
-
+      
             RuleFor(x => x.StartDate)
                 .NotEmpty().WithMessage("Start date is required.")
                 .LessThanOrEqualTo(x => x.EndDate).WithMessage("Start date must be before or equal to end date.");
@@ -64,9 +69,7 @@ namespace Backend.Application.Features.Absences.Commands
             RuleFor(x => x.AbsenceType)
                 .IsInEnum().WithMessage("Invalid absence type.");
 
-            RuleFor(x => x.StatusType)
-                .IsInEnum().WithMessage("Invalid status type.");
-
+       
             RuleFor(x => x.Reason)
                 .MaximumLength(500).WithMessage("Reason must not exceed 500 characters.")
                 .When(x => !string.IsNullOrEmpty(x.Reason));

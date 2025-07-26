@@ -4,11 +4,11 @@ using Backend.Infrastructure;
 using Backend.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.AddKeyVaultIfConfigured();
-builder.AddApplicationServices();
-builder.AddInfrastructureServices();
+builder.AddKeyVaultIfConfigured();   //  Load secrets/config first
 builder.AddWebServices();
+builder.AddInfrastructureServices(); // If it uses configs from KeyVault
+builder.AddApplicationServices();
+builder.Services.AddHttpContextAccessor();
 
 string localIp = GetLocalIPAddress();
 

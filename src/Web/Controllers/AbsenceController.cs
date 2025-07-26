@@ -51,15 +51,10 @@ public class AbsenceController : ControllerBase
     // PUT: api/absence/{id}
     [Authorize(Policy = "Absences.Edit")]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAbsence(int id, [FromBody] UpdateAbsenceCommand command)
+    public async Task<IActionResult> UpdateAbsence([FromBody] UpdateAbsenceCommand command)
     {
-        if (id != command.Id)
-        {
-            return BadRequest("ID mismatch");
-        }
-
         var result = await _sender.Send(command);
-        _logger.LogInformation("Updated absence with id {AbsenceId}. Result: {@Result}", id, result);
+        _logger.LogInformation("Updated absence with Result: {@Result}", result);
         return Ok(result);
     }
 

@@ -3,9 +3,6 @@ using Backend.Application.Common.Parameters;
 using Backend.Application.Common.Response;
 using Backend.Application.Features.Absences.Dto;
 using Backend.Application.Features.Absences.IRepositories;
-using Backend.Domain.Entities;
-using MediatR;
-using System.Linq.Expressions;
 
 namespace Backend.Application.Features.Absences.Queries
 {

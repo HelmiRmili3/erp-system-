@@ -37,7 +37,6 @@ namespace Backend.Application.Features.Attendances.Dto
     {
         public required string UserId { get; set; }
         public DateOnly AttendanceDay { get; init; }
-
         public TimeOnly? CheckIn { get; init; }
         public CheckMethod? CheckInMethod { get; init; }
         public double? CheckInLatitude { get; init; }

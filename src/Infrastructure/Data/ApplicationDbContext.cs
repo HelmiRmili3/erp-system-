@@ -21,9 +21,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<UserPermission> UserPermissions { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
-
-
-
     public DbSet<ApplicationRole> ApplicationRoles => Set<ApplicationRole>();
 
     protected override void OnModelCreating(ModelBuilder builder)
