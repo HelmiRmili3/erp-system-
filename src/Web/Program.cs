@@ -18,10 +18,12 @@ if (builder.Environment.IsDevelopment())
     {
         options.AddPolicy("AllowLocalhost", policy => policy.WithOrigins(
             "http://localhost:4000",
-            "https://localhost:4000",
+            "http://localhost:3000",
+            // "https://localhost:4000",
             "http://10.0.2.2:5001",
             $"http://{localIp}:5000",
-            $"https://{localIp}:5001",
+            "http://localhost:5001",
+            // $"https://{localIp}:5001",
             "http://localhost:8081"
         )
         .AllowAnyHeader()
@@ -41,6 +43,7 @@ else
                 "http://10.0.2.2:5001",
                 $"http://{localIp}:5000",
                 $"https://{localIp}:5001",
+                "http://localhost:5001",
                 "http://51.195.116.184:8081"
             )
             .AllowAnyHeader()
@@ -53,19 +56,27 @@ if (builder.Environment.IsDevelopment())
 {
     builder.WebHost.UseUrls(
         $"http://{localIp}:5000",
-        $"https://{localIp}:5001",
-        "http://localhost:5000",
-        "https://localhost:5001"
+        // $"https://{localIp}:5001",
+        "http://localhost:5000"
+    // "https://localhost:5001"
     );
 }
 
 var app = builder.Build();
 
+
 // Exception handling should be first
 app.UseExceptionHandler("/error");
 
 app.UseCors(app.Environment.IsDevelopment() ? "AllowLocalhost" : "AllowProduction");
-
+if (builder.Environment.IsDevelopment())
+{
+    app.UseCors("AllowLocalhost");
+}
+else
+{
+    app.UseCors("AllowProduction");
+}
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -162,7 +162,7 @@ namespace Backend.Infrastructure.Repository.Command.Base
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 TokenType = "Bearer",
-                ExpiresIn = 3600 // 1 hour
+                ExpiresIn = 900
             };
 
             return new Response<LoginResultDto>(loginResult, "Login successful");
@@ -211,18 +211,63 @@ namespace Backend.Infrastructure.Repository.Command.Base
                 return new Response<LoginResultDto>("User not found")
                     .WithError("USER_NOT_FOUND");
 
-            var authClaims = new List<Claim>
+            // var authClaims = new List<Claim>
+            // {
+            //     new Claim(ClaimTypes.NameIdentifier, user.Id),
+            //     new Claim(ClaimTypes.Email, user.Email ?? ""),
+            //     new Claim(ClaimTypes.GivenName, user.FirstName ?? ""),
+            //     new Claim(ClaimTypes.Surname, user.LastName ?? ""),
+            //     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            // };
+
+            // var roles = await _userManager.GetRolesAsync(user);
+            // authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            // Base claims
+            List<Claim> authClaims = new()
+    {
+        new Claim(ClaimTypes.Email, user.Email!),
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.GivenName, user.FirstName ?? ""),
+        new Claim(ClaimTypes.Surname, user.LastName ?? ""),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
+
+            // Step 1: Get roles assigned to user (by name)
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            // Add roles to claims
+            foreach (var role in userRoles)
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Email, user.Email ?? ""),
-                new Claim(ClaimTypes.GivenName, user.FirstName ?? ""),
-                new Claim(ClaimTypes.Surname, user.LastName ?? ""),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+                authClaims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
-            var roles = await _userManager.GetRolesAsync(user);
-            authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            // Step 2: Get matching Role IDs from DB
+            var roleIds = await _context.Roles
+                .Where(r => userRoles.Contains(r.Name!))
+                .Select(r => r.Id)
+                .ToListAsync();
 
+            // Step 3: Fetch permissions linked to those roles
+            var rolePermissions = await _context.RolePermissions
+                .Where(rp => roleIds.Contains(rp.RoleId))
+                .Include(rp => rp.Permission)
+                .Select(rp => rp.Permission.Name)
+                .ToListAsync();
+
+            // Step 4: Also fetch user-specific permissions
+            var userPermissions = await _context.UserPermissions
+                .Where(up => up.UserId == user.Id)
+                .Include(up => up.Permission)
+                .Select(up => up.Permission.Name)
+                .ToListAsync();
+
+            // Step 5: Merge, deduplicate, and add to JWT
+            var allPermissions = rolePermissions.Concat(userPermissions).Distinct();
+            authClaims.AddRange(allPermissions.Select(p => new Claim("Permission", p)));
+
+            // Generate tokens
+            // var accessToken = _jwtTokenService.GenerateAccessToken(authClaims);
+            // var refreshToken = _jwtTokenService.GenerateRefreshToken(authClaims);
             var newAccessToken = _jwtTokenService.GenerateAccessToken(authClaims);
             var newRefreshToken = _jwtTokenService.GenerateRefreshToken(authClaims);
 

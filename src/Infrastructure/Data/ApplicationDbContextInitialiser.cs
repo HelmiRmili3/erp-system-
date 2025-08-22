@@ -83,7 +83,7 @@ public class ApplicationDbContextInitialiser
         }
 
         // ➤ Create default admin user
-        var adminEmail = "administrator@localhost";
+        var adminEmail = "administrator@gmail.com";
         var adminUser = new ApplicationUser
         {
             UserName = adminEmail,
@@ -93,7 +93,7 @@ public class ApplicationDbContextInitialiser
 
         if (!_userManager.Users.Any(u => u.UserName == adminUser.UserName))
         {
-            var result = await _userManager.CreateAsync(adminUser, "Administrator1!");
+            var result = await _userManager.CreateAsync(adminUser, "Password-123");
 
             if (result.Succeeded)
             {

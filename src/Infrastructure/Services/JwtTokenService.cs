@@ -46,7 +46,7 @@ public class JwtTokenService : IJwtTokenService
     // Generate Refresh Token (long-lived)
     public string GenerateRefreshToken(IEnumerable<Claim> claims)
     {
-        int expiry = _configuration.GetValue<int>("JwtSettings:ExpiryInDays", 7) * 24 * 60; // days to minutes
+        int expiry = _configuration.GetValue<int>("JwtSettings:ExpiryInDays", 7) * 24 * 60;
         var claimsWithType = claims.Append(new Claim("typ", "refresh"));
         return GenerateToken(claimsWithType, expiry);
     }

@@ -37,10 +37,10 @@ RUN apt-get update && apt-get install -y netcat-openbsd
 
 # Set environment variables
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:80
+ENV ASPNETCORE_URLS=http://+:5000
 
 # Expose port 80
-EXPOSE 80
+EXPOSE 5000
 
 # Wait for PostgreSQL and run the app
 ENTRYPOINT ["sh", "-c", "until nc -z db 5432; do sleep 1; done; dotnet Backend.Web.dll"]
