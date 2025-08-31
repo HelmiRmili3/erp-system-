@@ -21,7 +21,7 @@ if (builder.Environment.IsDevelopment())
             "http://localhost:3000",
             // "https://localhost:4000",
             "http://10.0.2.2:5001",
-            $"http://{localIp}:5000",
+            $"http://{localIp}:3000",
             "http://localhost:5001",
             // $"https://{localIp}:5001",
             "http://localhost:8081"
@@ -40,8 +40,9 @@ else
                 "http://localhost:4000",
                 "http://localhost:8081",
                 "https://localhost:4000",
+                "http://localhost:3000",
                 "http://10.0.2.2:5001",
-                $"http://{localIp}:5000",
+                $"http://{localIp}:3000",
                 $"https://{localIp}:5001",
                 "http://localhost:5001",
                 "http://51.195.116.184:8081"

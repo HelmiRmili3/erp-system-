@@ -28,6 +28,74 @@ namespace Backend.Infrastructure.Repository.Command.Base
             _context = context;
         }
 
+        // public virtual async Task<Response<RegisterResultDto>> RegisterAsync(RegisterDto registerDto)
+        // {
+        //     try
+        //     {
+        //         var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
+        //         if (existingUser != null)
+        //             return new Response<RegisterResultDto>("User with this email already exists");
+
+        //         var existingUserByName = await _userManager.FindByNameAsync(registerDto.UserName);
+        //         if (existingUserByName != null)
+        //             return new Response<RegisterResultDto>("Username already exists");
+
+        //         var adminEmail = "administrator@gmail.com";
+        //         var adminUser = await _userManager.FindByEmailAsync(adminEmail);
+        //         if (adminUser == null)
+        //             return new Response<RegisterResultDto>("Admin user not found to set as supervisor");
+        //         var user = new ApplicationUser
+        //         {
+        //             UserName = registerDto.UserName,
+        //             Email = registerDto.Email,
+        //             EmailConfirmed = true,
+        //             FirstName = registerDto.FirstName,
+        //             LastName = registerDto.LastName,
+        //             BirthDate = registerDto.BirthDate,
+        //             Address = registerDto.Address,
+        //             PhoneNumber = registerDto.Phone,
+        //             JobTitle = registerDto.JobTitle,
+        //             Department = registerDto.Department,
+        //             HireDate = registerDto.HireDate,
+        //             ContractType = registerDto.ContractType,
+        //             Status = registerDto.Status,
+        //             SupervisorId = adminUser.Id,
+        //             CreatedBy = adminUser.Id,
+        //             UpdatedBy = adminUser.Id,
+        //             CreatedAt = DateTime.UtcNow
+        //         };
+
+        //         var result = await _userManager.CreateAsync(user, registerDto.Password);
+        //         if (result.Succeeded)
+        //         {
+        //             var registerResult = new RegisterResultDto
+        //             {
+        //                 Id = user.Id,
+        //                 Email = user.Email,
+        //                 UserName = user.UserName,
+        //                 FirstName = user.FirstName,
+        //                 LastName = user.LastName,
+        //                 BirthDate = user.BirthDate,
+        //                 Address = user.Address,
+        //                 Phone = user.PhoneNumber,
+        //                 JobTitle = user.JobTitle,
+        //                 Department = user.Department,
+        //                 HireDate = user.HireDate,
+        //                 ContractType = user.ContractType,
+        //                 Status = user.Status,
+        //                 SupervisorId = user.SupervisorId
+        //             };
+        //             return new Response<RegisterResultDto>(registerResult, "User registered successfully");
+        //         }
+
+        //         var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+        //         return new Response<RegisterResultDto>($"Registration failed: {errors}");
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return new Response<RegisterResultDto>($"Registration failed: {ex.Message}");
+        //     }
+        // }
         public virtual async Task<Response<RegisterResultDto>> RegisterAsync(RegisterDto registerDto)
         {
             try
@@ -40,7 +108,7 @@ namespace Backend.Infrastructure.Repository.Command.Base
                 if (existingUserByName != null)
                     return new Response<RegisterResultDto>("Username already exists");
 
-                var adminEmail = "administrator@localhost"; // Or get from config
+                var adminEmail = "administrator@gmail.com";
                 var adminUser = await _userManager.FindByEmailAsync(adminEmail);
                 if (adminUser == null)
                     return new Response<RegisterResultDto>("Admin user not found to set as supervisor");
@@ -69,6 +137,19 @@ namespace Backend.Infrastructure.Repository.Command.Base
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
                 if (result.Succeeded)
                 {
+                    // ➤ Assign Employee role to the new user
+                    var employeeRoleName = "Employee"; // Make sure this matches your Roles.Employee constant
+                    var roleResult = await _userManager.AddToRoleAsync(user, employeeRoleName);
+
+                    if (!roleResult.Succeeded)
+                    {
+                        // Log role assignment errors but don't fail the registration
+                        var roleErrors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+
+                        // You might want to handle this differently based on your requirements
+                        // For now, we'll continue with registration but log the warning
+                    }
+
                     var registerResult = new RegisterResultDto
                     {
                         Id = user.Id,
@@ -97,7 +178,6 @@ namespace Backend.Infrastructure.Repository.Command.Base
                 return new Response<RegisterResultDto>($"Registration failed: {ex.Message}");
             }
         }
-
         public virtual async Task<Response<LoginResultDto>> LoginAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);

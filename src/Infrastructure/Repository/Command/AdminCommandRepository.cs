@@ -5,9 +5,9 @@ using Backend.Infrastructure.Data;
 using Backend.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+// using System.Collections.Generic;
+// using System.Linq;
+// using System.Threading.Tasks;
 
 public class AdminCommandRepository : IAdminCommandRepository
 {
@@ -69,7 +69,6 @@ public class AdminCommandRepository : IAdminCommandRepository
         return Result.Success();
     }
 
-
     public async Task<Result> AssignRolesToUserAsync(string userId, IEnumerable<string> roles)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -102,9 +101,6 @@ public class AdminCommandRepository : IAdminCommandRepository
 
         return Result.Success();
     }
-
-
-
 
     public async Task<Result> AssignPermissionsToUserAsync(string userId, IEnumerable<string> permissionNames)
     {

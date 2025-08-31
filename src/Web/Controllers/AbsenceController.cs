@@ -73,9 +73,9 @@ public class AbsenceController : ControllerBase
     // GET: api/absence/my
     [Authorize(Roles = "Employee", Policy = "Absences.View")]
     [HttpGet("me")]
-    public async Task<IActionResult> GetMyAbsences([FromQuery] PagingParameter paging,[FromQuery] int? month, [FromQuery] int? year)
+    public async Task<IActionResult> GetMyAbsences([FromQuery] PagingParameter paging, [FromQuery] int? month, [FromQuery] int? year)
     {
-        var query = new GetEmployeeAbsencesByIdQuery(paging,month, year);
+        var query = new GetEmployeeAbsencesByIdQuery(paging, month, year);
         var result = await _sender.Send(query);
         _logger.LogInformation("Retrieved absences for current user with filters - Month: {Month}, Year: {Year}", month, year);
         return Ok(result);

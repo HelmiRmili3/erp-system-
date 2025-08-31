@@ -162,7 +162,7 @@ public class AdminQueryRepository : IAdminQueryRepository
             .Include(u => u.UserPermissions)
                 .ThenInclude(up => up.Permission)
             .Include(u => u.Supervisor)
-            .OrderBy(u => u.LastName) 
+            .OrderBy(u => u.LastName)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -240,5 +240,5 @@ public class AdminQueryRepository : IAdminQueryRepository
         return new PagedResponse<List<UserDto>>(userDtos, pageNumber, pageSize, recordsCount);
     }
 
-   
+
 }
