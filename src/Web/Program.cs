@@ -24,7 +24,8 @@ if (builder.Environment.IsDevelopment())
             $"http://{localIp}:3000",
             "http://localhost:5001",
             // $"https://{localIp}:5001",
-            "http://localhost:8081"
+            "http://localhost:8081",
+            "http://172.190.236.125:3000"
         )
         .AllowAnyHeader()
         .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
@@ -45,7 +46,8 @@ else
                 $"http://{localIp}:3000",
                 $"https://{localIp}:5001",
                 "http://localhost:5001",
-                "http://51.195.116.184:8081"
+                "http://51.195.116.184:8081",
+                "http://172.190.236.125:3000"
             )
             .AllowAnyHeader()
             .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
