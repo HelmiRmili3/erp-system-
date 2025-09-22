@@ -19,6 +19,8 @@ if (builder.Environment.IsDevelopment())
         options.AddPolicy("AllowLocalhost", policy => policy.WithOrigins(
             "http://localhost:4000",
             "http://localhost:3000",
+            "http://localhost:3000",
+            "http://localhost",
             // "https://localhost:4000",
             "http://10.0.2.2:5001",
             $"http://{localIp}:3000",
@@ -38,7 +40,7 @@ else
     {
         options.AddPolicy("AllowProduction", policy => policy
             .WithOrigins(
-                "http://localhost:4000",
+              "http://localhost:4000",
                 "http://localhost:8081",
                 "https://localhost:4000",
                 "http://localhost:3000",
@@ -47,7 +49,8 @@ else
                 $"https://{localIp}:5001",
                 "http://localhost:5001",
                 "http://51.195.116.184:8081",
-                "http://172.190.236.125:3000"
+                "http://helmirmili.tn",
+                "https://helmirmili.tn"
             )
             .AllowAnyHeader()
             .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")

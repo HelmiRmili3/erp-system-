@@ -1,6 +1,8 @@
 ﻿using Backend.Application.Common.Interfaces;
 using Backend.Application.Common.Response;
 using Backend.Application.Features.Expenses.Dtos;
+using Backend.Application.Features.User.IRepositories;
+using Backend.Application.Features.User.Dto;
 using Backend.Domain.Entities;
 using FluentValidation;
 using MediatR;
@@ -12,10 +14,14 @@ public record GetExpenseByIdQuery(int Id) : IRequest<Response<ExpenseDto>>;
 public class GetExpenseQueryHandler : IRequestHandler<GetExpenseByIdQuery, Response<ExpenseDto>>
 {
     private readonly IQueryRepository<Expense> _repository;
+    private readonly IUserQueryRepository _userRepository;
 
-    public GetExpenseQueryHandler(IQueryRepository<Expense> repository)
+    public GetExpenseQueryHandler(
+        IQueryRepository<Expense> repository,
+        IUserQueryRepository userRepository)
     {
         _repository = repository;
+        _userRepository = userRepository;
     }
 
     public async Task<Response<ExpenseDto>> Handle(GetExpenseByIdQuery request, CancellationToken cancellationToken)
@@ -28,6 +34,12 @@ public class GetExpenseQueryHandler : IRequestHandler<GetExpenseByIdQuery, Respo
                 .WithError("NotFound", "Expense not found.");
         }
 
+        UserDataDto? userDto = null;
+        if (!string.IsNullOrWhiteSpace(entity.UserId))
+        {
+            userDto = await _userRepository.GetByIdAsync(entity.UserId, cancellationToken);
+        }
+
         var dto = new ExpenseDto
         {
             Id = entity.Id,
@@ -37,6 +49,8 @@ public class GetExpenseQueryHandler : IRequestHandler<GetExpenseByIdQuery, Respo
             ExpenseDate = entity.ExpenseDate,
             Category = entity.Category,
             Status = entity.Status,
+            ReceiptPath = entity.ReceiptPath!,
+            User = userDto
         };
 
         return new Response<ExpenseDto>(dto, "Expense retrieved successfully.");

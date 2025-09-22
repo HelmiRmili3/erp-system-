@@ -1,8 +1,9 @@
-﻿using Backend.Application.Common.Extensions;
-using Backend.Application.Common.Parameters;
+﻿using Backend.Application.Common.Parameters;
 using Backend.Application.Common.Response;
 using Backend.Application.Features.Absences.Dto;
 using Backend.Application.Features.Absences.IRepositories;
+using Backend.Application.Features.User.IRepositories;
+using Backend.Application.Features.User.Dto;
 
 namespace Backend.Application.Features.Absences.Queries
 {
@@ -11,28 +12,53 @@ namespace Backend.Application.Features.Absences.Queries
     public class GetAbsencesQueryHandler : IRequestHandler<GetAbsencesQuery, PagedResponse<List<AbsenceDto>>>
     {
         private readonly IAbsenceQueryRepository _repository;
+        private readonly IUserQueryRepository _userRepository;
 
-        public GetAbsencesQueryHandler(IAbsenceQueryRepository repository)
+        public GetAbsencesQueryHandler(
+            IAbsenceQueryRepository repository,
+            IUserQueryRepository userRepository)
         {
             _repository = repository;
+            _userRepository = userRepository;
         }
 
         public async Task<PagedResponse<List<AbsenceDto>>> Handle(GetAbsencesQuery request, CancellationToken cancellationToken)
         {
-            // Pass filter as null to get all, and includeTable as null or empty string if no navigation properties needed
             var pagedResult = await _repository.GetPagedAsync(
-                filter: null,             // No filter; get all records
+                filter: null,
                 pageNumber: request.PagingParameter.PageNumber,
                 pageSize: request.PagingParameter.PageSize,
-                includeTable: null,       // or "" if you want
+                includeTable: null,
                 cancellationToken: cancellationToken
             );
 
-            // pagedResult is PagedResponse<List<Absence>>
-            // Map each Absence entity to AbsenceDto
-            var dtoList = pagedResult.Data?.Select(a => a.ToDto<AbsenceDto>()).ToList() ?? new List<AbsenceDto>();
+            var dtoList = new List<AbsenceDto>();
 
-            // Return a new PagedResponse of List<AbsenceDto> with same pagination metadata
+            if (pagedResult.Data != null)
+            {
+                foreach (var absence in pagedResult.Data)
+                {
+                    UserDataDto? userDto = null;
+
+                    if (!string.IsNullOrWhiteSpace(absence.UserId))
+                    {
+                        userDto = await _userRepository.GetByIdAsync(absence.UserId, cancellationToken);
+                    }
+
+                    dtoList.Add(new AbsenceDto
+                    {
+                        Id = absence.Id,
+                        UserId = absence.UserId,
+                        StartDate = absence.StartDate,
+                        EndDate = absence.EndDate,
+                        AbsenceType = absence.AbsenceType,
+                        StatusType = absence.StatusType,
+                        Reason = absence.Reason,
+                        User = userDto
+                    });
+                }
+            }
+
             return new PagedResponse<List<AbsenceDto>>(
                 data: dtoList,
                 pageNumber: pagedResult.PageNumber,

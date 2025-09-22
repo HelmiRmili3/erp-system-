@@ -1,8 +1,12 @@
-﻿namespace Backend.Application.Features.Payrolls.Dtos
+﻿using Backend.Application.Features.User.Dto;
+
+namespace Backend.Application.Features.Payrolls.Dtos
 {
     public class PayrollDto : BasePayrollDto
     {
         public int Id { get; init; }
+        public UserDataDto? User { get; set; }
+
     }
 
     public class BasePayrollDto

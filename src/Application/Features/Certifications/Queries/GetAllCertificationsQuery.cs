@@ -2,8 +2,9 @@
 using Backend.Application.Common.Response;
 using Backend.Application.Features.Certifications.Dto;
 using Backend.Application.Common.Interfaces;
-using Backend.Application.Common.Extensions;
 using Backend.Application.Common.Parameters;
+using Backend.Application.Features.User.IRepositories;
+using Backend.Application.Features.User.Dto;
 
 namespace Backend.Application.Features.Certifications.Queries;
 
@@ -18,10 +19,14 @@ public record GetAllCertificationsQuery(
 public class GetAllCertificationsQueryHandler : IRequestHandler<GetAllCertificationsQuery, PagedResponse<List<CertificationDto>>>
 {
     private readonly IQueryRepository<Certification> _repository;
+    private readonly IUserQueryRepository _userRepository;
 
-    public GetAllCertificationsQueryHandler(IQueryRepository<Certification> repository)
+    public GetAllCertificationsQueryHandler(
+        IQueryRepository<Certification> repository,
+        IUserQueryRepository userRepository)
     {
         _repository = repository;
+        _userRepository = userRepository;
     }
 
     public async Task<PagedResponse<List<CertificationDto>>> Handle(GetAllCertificationsQuery request, CancellationToken cancellationToken)
@@ -49,14 +54,38 @@ public class GetAllCertificationsQueryHandler : IRequestHandler<GetAllCertificat
         }
 
         var pagedResult = await _repository.GetPagedAsync(
-                  filter: filter,
-                  pageNumber: request.PagingParameter.PageNumber,
-                  pageSize: request.PagingParameter.PageSize,
-                  includeTable: null,
-                  cancellationToken: cancellationToken
-              );
+            filter: filter,
+            pageNumber: request.PagingParameter.PageNumber,
+            pageSize: request.PagingParameter.PageSize,
+            includeTable: null, // No navigation property here
+            cancellationToken: cancellationToken
+        );
 
-        var dtoList = pagedResult.Data?.Select(a => a.ToDto<CertificationDto>()).ToList() ?? new List<CertificationDto>();
+        var dtoList = new List<CertificationDto>();
+
+        if (pagedResult.Data != null)
+        {
+            foreach (var cert in pagedResult.Data)
+            {
+                UserDataDto? userDto = null;
+
+                if (!string.IsNullOrWhiteSpace(cert.UserId))
+                {
+                    userDto = await _userRepository.GetByIdAsync(cert.UserId, cancellationToken);
+                }
+
+                dtoList.Add(new CertificationDto
+                {
+                    Id = cert.Id,
+                    UserId = cert.UserId,
+                    Name = cert.Name,
+                    Authority = cert.Authority,
+                    DateObtained = cert.DateObtained,
+                    FileUrl = cert.FileUrl ?? string.Empty,
+                    User = userDto
+                });
+            }
+        }
 
         return new PagedResponse<List<CertificationDto>>(
             data: dtoList,
@@ -70,6 +99,7 @@ public class GetAllCertificationsQueryHandler : IRequestHandler<GetAllCertificat
         );
     }
 }
+
 
 public class GetAllCertificationsQueryValidator : AbstractValidator<GetAllCertificationsQuery>
 {

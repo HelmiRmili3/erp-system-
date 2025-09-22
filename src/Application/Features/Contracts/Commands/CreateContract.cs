@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Backend.Application.Common.Interfaces;
 using Backend.Application.Common.Response;
+using Backend.Application.Features.Authentication.Dto;
 using Backend.Application.Features.Contracts.Dtos;
 using Backend.Domain.Entities;
 using FluentValidation;
@@ -18,19 +19,22 @@ public class CreateContractCommandHandler : IRequestHandler<CreateContractComman
 {
     private readonly ICommandRepository<Contract> _repository;
     private readonly IFileService _fileService;
+    private readonly IMapper _mapper;
+
 
     public CreateContractCommandHandler(
         ICommandRepository<Contract> repository,
-        IFileService fileService)
+        IFileService fileService,
+         IMapper mapper)
     {
         _repository = repository;
         _fileService = fileService;
+        _mapper = mapper;
+
     }
 
     public async Task<Response<int>> Handle(CreateContractCommand request, CancellationToken cancellationToken)
     {
-        var dto = request.Contract;
-
         string? fileUrl = null;
 
         if (request.File is { Length: > 0 })
@@ -40,38 +44,35 @@ public class CreateContractCommandHandler : IRequestHandler<CreateContractComman
             fileUrl = $"/files/{relativePath.Replace("\\", "/")}";
         }
 
-        var entity = new Contract
+        // Map manually
+        var contract = new Contract
         {
-            UserId = dto.UserId,
-            ContractType = dto.ContractType,
-            StartDate = dto.StartDate.ToUniversalTime(),
-            EndDate = dto.EndDate?.ToUniversalTime(),
-            FileUrl = fileUrl,
-            Status = dto.Status
+            UserId = request.Contract.UserId,
+            ContractType = request.Contract.ContractType,
+            StartDate = request.Contract.StartDate,
+            EndDate = request.Contract.EndDate,
+            Status = request.Contract.Status,
+            FileUrl = fileUrl // safe assignment
         };
 
-        await _repository.AddAsync(entity, cancellationToken);
-        return new Response<int>(entity.Id, "Contract created successfully.");
+        await _repository.AddAsync(contract, cancellationToken);
+
+        return new Response<int>(contract.Id, "Contract created successfully.");
     }
+
+
 }
 
-public class CreateContractCommandValidator : AbstractValidator<CreateContractCommand>
+public class CreateContractCommandValidator : AbstractValidator<ContractAddDto>
 {
     public CreateContractCommandValidator()
     {
-        RuleFor(x => x.Contract.StartDate)
+        RuleFor(x => x.StartDate)
             .NotEmpty().WithMessage("Start date is required.");
 
-        RuleFor(x => x.Contract.EndDate)
-            .GreaterThan(x => x.Contract.StartDate)
-            .When(x => x.Contract.EndDate.HasValue)
+        RuleFor(x => x.EndDate)
+            .GreaterThan(x => x.StartDate)
+            .When(x => x.EndDate.HasValue)
             .WithMessage("End date must be after the start date.");
-
-        When(x => x.File != null, () =>
-        {
-            RuleFor(x => x.File!.Length)
-                .LessThanOrEqualTo(10 * 1024 * 1024) // e.g., Max 10MB
-                .WithMessage("File must be less than or equal to 10MB.");
-        });
     }
 }

@@ -131,7 +131,8 @@ namespace Backend.Infrastructure.Repository.Command.Base
                     SupervisorId = adminUser.Id,
                     CreatedBy = adminUser.Id,
                     UpdatedBy = adminUser.Id,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    FileUrl = registerDto.FileUrl
                 };
 
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
@@ -165,7 +166,9 @@ namespace Backend.Infrastructure.Repository.Command.Base
                         HireDate = user.HireDate,
                         ContractType = user.ContractType,
                         Status = user.Status,
-                        SupervisorId = user.SupervisorId
+                        SupervisorId = user.SupervisorId,
+                        FileUrl = user.FileUrl
+
                     };
                     return new Response<RegisterResultDto>(registerResult, "User registered successfully");
                 }

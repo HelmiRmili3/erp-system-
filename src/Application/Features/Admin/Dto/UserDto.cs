@@ -14,6 +14,7 @@ public class UserDto
     public string? Address { get; set; }
     public required string FullName { get; set; }
     public required string Email { get; set; }
+    public string FileUrl { get; set; } = string.Empty;
 
     // Professional Information
     public required string JobTitle { get; set; } 

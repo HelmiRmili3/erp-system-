@@ -224,6 +224,7 @@ public class AdminQueryRepository : IAdminQueryRepository
                 UpdatedAt = u.UpdatedAt,
                 UpdatedBy = u.UpdatedBy ?? "",
                 SupervisorId = u.SupervisorId ?? "",
+                FileUrl = u.FileUrl,
                 SupervisorFullName = u.Supervisor != null ? $"{u.Supervisor.FirstName} {u.Supervisor.LastName}" : "",
                 Roles = rolesForUserNames,
                 Permissions = allPermissions

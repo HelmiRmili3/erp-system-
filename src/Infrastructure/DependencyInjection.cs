@@ -30,6 +30,10 @@ using Backend.Application.Features.Contracts.IRepositories;
 using Backend.Application.Features.Expenses.IRepositories;
 using Backend.Application.Features.Payrolls.IRepositories;
 using Backend.Application.Features.Admin.Repositories;
+using Backend.Application.Features.User.IRepositories;
+using Backend.Infrastructure.Repository.User;
+using Swashbuckle.AspNetCore.Filters;
+using Backend.Application.Features.Authentication.Examples;
 
 namespace Backend.Infrastructure;
 
@@ -159,6 +163,9 @@ public static class DependencyInjection
         // Payroll
         builder.Services.AddTransient<IPayrollCommandRepository, PayrollCommandRepository>();
         builder.Services.AddTransient<IPayrollQueryRepository, PayrollQueryRepository>();
+        // User
+        builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+        //builder.Services.AddSwaggerExamplesFromAssemblyOf<RegisterUserRequestExample>();
 
         builder.Services.AddAuthorization(options =>
         {

@@ -1,10 +1,13 @@
-﻿using Backend.Domain.Enums;
+﻿using Backend.Application.Features.User.Dto;
+using Backend.Domain.Enums;
 
 namespace Backend.Application.Features.Expenses.Dtos
 {
     public class ExpenseDto : BaseExpenseDto
     {
         public int Id { get; init; }
+        public UserDataDto? User { get; set; }
+
     }
 
     public class BaseExpenseDto

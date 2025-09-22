@@ -5,10 +5,6 @@ using Backend.Infrastructure.Data;
 using Backend.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.Threading.Tasks;
-
 public class AdminCommandRepository : IAdminCommandRepository
 {
     private readonly ApplicationDbContext _context;

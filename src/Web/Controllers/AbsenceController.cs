@@ -80,5 +80,25 @@ public class AbsenceController : ControllerBase
         _logger.LogInformation("Retrieved absences for current user with filters - Month: {Month}, Year: {Year}", month, year);
         return Ok(result);
     }
+    // PUT: api/absences/{id}/accept
+    [Authorize(Policy = "Absences.Edit")]
+    [HttpPut("{id}/accept")]
+    public async Task<IActionResult> AcceptAbsence(int id)
+    {
+        var result = await _sender.Send(new AcceptAbsenceCommand(id));
+        _logger.LogInformation("Accepted absence with id {AbsenceId}. Result: {@Result}", id, result);
+        return Ok(result);
+    }
+
+    // PUT: api/absences/{id}/reject
+    [Authorize(Policy = "Absences.Edit")]
+    [HttpPut("{id}/reject")]
+    public async Task<IActionResult> RejectAbsence(int id)
+    {
+        var result = await _sender.Send(new RejectAbsenceCommand(id));
+        _logger.LogInformation("Rejected absence with id {AbsenceId}. Result: {@Result}", id, result);
+        return Ok(result);
+    }
+
 
 }

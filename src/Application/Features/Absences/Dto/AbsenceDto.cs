@@ -1,8 +1,11 @@
-﻿using Backend.Domain.Enums;
+﻿using Backend.Application.Features.User.Dto;
+using Backend.Domain.Enums;
 namespace Backend.Application.Features.Absences.Dto
 {
     public class AbsenceDto : BaseAbsenceDto
     {
+        public UserDataDto? User { get; set; }
+
     }
 
     public class BaseAbsenceDto

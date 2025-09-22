@@ -1,40 +1,21 @@
-# Use .NET 9 SDK for dev
+# Use full SDK in dev mode
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS dev
-
 WORKDIR /app
 
-# Environment for hot reload
-ENV ASPNETCORE_ENVIRONMENT=Development
-ENV ASPNETCORE_URLS=http://+:5000
-ENV DOTNET_USE_POLLING_FILE_WATCHER=1
-ENV DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true
+# Copy only solution + props first (for restore caching)
+COPY *.sln ./
+COPY Directory.Packages.props ./
+COPY Directory.Build.props ./
 
-# Install netcat for waiting on PostgreSQL
-RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
-
-# Copy sln and props for restore
-COPY *.sln .
-COPY Directory.Packages.props .
-COPY Directory.Build.props .
-
-# Copy only csproj files (for better caching)
 COPY src/Domain/*.csproj ./src/Domain/
 COPY src/Application/*.csproj ./src/Application/
 COPY src/Infrastructure/*.csproj ./src/Infrastructure/
 COPY src/Web/*.csproj ./src/Web/
-COPY tests/Application.FunctionalTests/*.csproj ./tests/Application.FunctionalTests/
-COPY tests/Application.UnitTests/*.csproj ./tests/Application.UnitTests/
-COPY tests/Domain.UnitTests/*.csproj ./tests/Domain.UnitTests/
-COPY tests/Infrastructure.IntegrationTests/*.csproj ./tests/Infrastructure.IntegrationTests/
 
-# Restore
-RUN dotnet restore Backend.sln
+RUN dotnet restore src/Web/Web.csproj
 
-# Copy source
-COPY src/ ./src/
-COPY tests/ ./tests/
+# Copy everything
+COPY . .
 
-EXPOSE 5000
-
-# Wait for db and run hot reload
-CMD sh -c "until nc -z db 5432; do echo 'Waiting for PostgreSQL...'; sleep 2; done; dotnet watch run --project src/Web/Web.csproj --urls http://+:5000"
+# Run the app in watch (hot reload) mode
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "src/Web/Web.csproj", "--urls", "http://+:5000"]

@@ -7,5 +7,7 @@ public class Certification : BaseAuditableEntity
     public required string Name { get; set; }
     public required string Authority { get; set; }
     public DateTime DateObtained { get; set; }
-    public  string? FileUrl { get; set; } // PDF contract path
+    public  string? FileUrl { get; set; }
+
+    
 }

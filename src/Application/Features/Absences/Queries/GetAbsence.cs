@@ -1,8 +1,8 @@
-﻿using Backend.Application.Common.Extensions;
-using Backend.Application.Common.Response;
+﻿using Backend.Application.Common.Response;
 using Backend.Application.Features.Absences.Dto;
 using Backend.Application.Features.Absences.IRepositories;
-using Backend.Domain.Entities;
+using Backend.Application.Features.User.IRepositories;
+using Backend.Application.Features.User.Dto;
 using MediatR;
 
 namespace Backend.Application.Features.Absences.Queries
@@ -12,10 +12,14 @@ namespace Backend.Application.Features.Absences.Queries
     public class GetAbsenceQueryHandler : IRequestHandler<GetAbsenceQuery, Response<AbsenceDto>>
     {
         private readonly IAbsenceQueryRepository _repository;
+        private readonly IUserQueryRepository _userRepository;
 
-        public GetAbsenceQueryHandler(IAbsenceQueryRepository repository)
+        public GetAbsenceQueryHandler(
+            IAbsenceQueryRepository repository,
+            IUserQueryRepository userRepository)
         {
             _repository = repository;
+            _userRepository = userRepository;
         }
 
         public async Task<Response<AbsenceDto>> Handle(GetAbsenceQuery request, CancellationToken cancellationToken)
@@ -27,7 +31,26 @@ namespace Backend.Application.Features.Absences.Queries
                 return new Response<AbsenceDto>("Absence not found");
             }
 
-            return new Response<AbsenceDto>(absence.ToDto<AbsenceDto>());
+            UserDataDto? userDto = null;
+
+            if (!string.IsNullOrWhiteSpace(absence.UserId))
+            {
+                userDto = await _userRepository.GetByIdAsync(absence.UserId, cancellationToken);
+            }
+
+            var dto = new AbsenceDto
+            {
+                Id = absence.Id,
+                UserId = absence.UserId,
+                StartDate = absence.StartDate,
+                EndDate = absence.EndDate,
+                AbsenceType = absence.AbsenceType,
+                StatusType = absence.StatusType,
+                Reason = absence.Reason,
+                User = userDto
+            };
+
+            return new Response<AbsenceDto>(dto, "Absence retrieved successfully");
         }
     }
 }

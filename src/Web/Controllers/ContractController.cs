@@ -32,7 +32,6 @@ public class ContractController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Produces("application/json")]
     [Authorize(Policy = "Contracts.Create")]
-
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> CreateContract([FromForm] CreateContractCommand command)
     {

@@ -1,10 +1,12 @@
-﻿using Backend.Domain.Enums;
+﻿using Backend.Application.Features.User.Dto;
+using Backend.Domain.Enums;
 
 namespace Backend.Application.Features.Attendances.Dto
 {
     public class AttendanceDto : BaseAttendanceDto
     {
-        // Extend here with additional relations if needed
+        public UserDataDto? User { get; set; }
+
     }
 
     public class BaseAttendanceDto

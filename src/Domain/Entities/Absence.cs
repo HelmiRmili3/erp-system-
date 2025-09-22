@@ -1,5 +1,4 @@
-﻿using Backend.Domain.Entities;
-
+﻿
 public class Absence : BaseAuditableEntity
 {
     public required string UserId { get; set; } 

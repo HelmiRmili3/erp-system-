@@ -2,4 +2,6 @@
 namespace Backend.Application.Features.Absences.IRepositories;
 public interface IAbsenceCommandRepository : ICommandRepository<Absence>
 {
+    Task ApproveAbsenceAsync(int absenceId);
+    Task RejectAbsenceAsync(int absenceId);
 }

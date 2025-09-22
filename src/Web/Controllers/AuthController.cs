@@ -1,9 +1,11 @@
 using System.Security.Claims;
 using Backend.Application.Features.Authentication.Commands;
 using Backend.Application.Features.Authentication.Dto;
+using Backend.Application.Features.Authentication.Examples;
 using Backend.Application.Features.Authentication.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace Backend.Web.Controllers;
 
@@ -34,7 +36,8 @@ public class AuthController : ControllerBase
     [Authorize(Roles = "Administrator")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Register([FromForm] RegisterUserCommand command)
     {
         var result = await _sender.Send(command);
         return result.Succeeded ? Ok(result) : BadRequest(result);

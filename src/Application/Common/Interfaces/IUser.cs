@@ -5,4 +5,6 @@ public interface IUser
     string? Id { get; }
     string Email { get; }
     string UserName { get; }
+
+    //string FileUrl { get; }
 }

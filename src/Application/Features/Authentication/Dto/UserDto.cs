@@ -6,6 +6,7 @@ namespace Backend.Application.Features.Authentication.Dto
     {
         public required string Id { get; set; }
         public string UserName { get; set; } = string.Empty;
+        public string FileUrl { get; set; } = string.Empty;
         public required string Email { get; set; } 
         public required string Password { get; set; }
     }

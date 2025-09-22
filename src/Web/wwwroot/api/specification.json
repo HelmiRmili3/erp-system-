@@ -279,6 +279,82 @@
         ]
       }
     },
+    "/api/Absences/{id}/accept": {
+      "put": {
+        "tags": [
+          "Absence"
+        ],
+        "operationId": "Absence_AcceptAbsence",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Absences/{id}/reject": {
+      "put": {
+        "tags": [
+          "Absence"
+        ],
+        "operationId": "Absence_RejectAbsence",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Admin/create-role": {
       "post": {
         "tags": [
@@ -953,16 +1029,70 @@
         ],
         "operationId": "Auth_Register",
         "requestBody": {
-          "x-name": "command",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterUserCommand"
+                "type": "object",
+                "properties": {
+                  "Data.Email": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Data.UserName": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Data.Password": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Data.FirstName": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Data.LastName": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Data.BirthDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                  },
+                  "Data.Address": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Data.Phone": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Data.JobTitle": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Data.Department": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Data.HireDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                  },
+                  "Data.Status": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary",
+                    "nullable": true
+                  }
+                }
               }
             }
-          },
-          "required": true,
-          "x-position": 1
+          }
         },
         "responses": {
           "200": {
@@ -2591,99 +2721,6 @@
           }
         }
       },
-      "RegisterUserCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/RegisterDto"
-          }
-        }
-      },
-      "RegisterDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "userName": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "birthDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "address": {
-            "type": "string",
-            "nullable": true
-          },
-          "phone": {
-            "type": "string",
-            "nullable": true
-          },
-          "jobTitle": {
-            "type": "string"
-          },
-          "department": {
-            "type": "string"
-          },
-          "hireDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "contractType": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ContractType"
-              }
-            ]
-          },
-          "status": {
-            "$ref": "#/components/schemas/EmployeeStatus"
-          }
-        }
-      },
-      "ContractType": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Permanent",
-          "Temporary",
-          "Freelance"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
-      },
-      "EmployeeStatus": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Active",
-          "Inactive",
-          "Terminated"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
-      },
       "RefreshTokenCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -2811,6 +2848,34 @@
             "$ref": "#/components/schemas/EmployeeStatus"
           }
         }
+      },
+      "ContractType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Permanent",
+          "Temporary",
+          "Freelance"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "EmployeeStatus": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Active",
+          "Inactive",
+          "Terminated"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
       },
       "UpdateExpenseCommand": {
         "type": "object",

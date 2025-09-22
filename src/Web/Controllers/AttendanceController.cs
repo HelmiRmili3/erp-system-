@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Backend.Application.Common.Parameters;
 using Backend.Application.Features.Attendances.Commands;
+using Backend.Application.Features.Attendances.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

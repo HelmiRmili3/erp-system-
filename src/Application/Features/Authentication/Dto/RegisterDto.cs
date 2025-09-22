@@ -12,6 +12,8 @@ namespace Backend.Application.Features.Authentication.Dto
         // Personal Information
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
+        public string FileUrl { get; set; } = string.Empty;
+
         public DateTime? BirthDate { get; set; }
         public string? Address { get; set; }
         public string? Phone {  get; set; }
@@ -24,8 +26,5 @@ namespace Backend.Application.Features.Authentication.Dto
 
         // Optional: you can allow setting Status or leave it default as Active
         public EmployeeStatus Status { get; set; } = EmployeeStatus.Active;
-
-        // Optional: Supervisor if registering from admin
-        //public string? SupervisorId { get; set; }
     }
 }

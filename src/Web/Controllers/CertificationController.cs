@@ -30,7 +30,7 @@ public class CertificationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Produces("application/json")]
-    [Authorize(Policy = "Certification.Create")]
+    [Authorize(Policy = "Certifications.Create")]
     [Consumes("multipart/form-data")]
 
     public async Task<IActionResult> CreateCertification([FromForm] CreateCertificationCommand command)

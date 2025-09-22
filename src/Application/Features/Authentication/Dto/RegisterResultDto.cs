@@ -16,6 +16,7 @@ public class RegisterResultDto
     public DateTime? BirthDate { get; set; }
     public string? Address { get; set; }
     public string? Phone { get; set; }
+    public string FileUrl { get; set; } = string.Empty;
 
     // Professional Info
     public string JobTitle { get; set; } = string.Empty;
@@ -26,13 +27,6 @@ public class RegisterResultDto
 
     // Supervisor
     public string? SupervisorId { get; set; }
-
-    // ✅ New fields to include in /auth/me response
-
     public List<string> Roles { get; set; } = new();
-
-    // These are all permissions from:
-    // - user direct permissions
-    // - permissions from assigned roles
     public List<string> Permissions { get; set; } = new();
 }

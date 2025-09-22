@@ -1,8 +1,10 @@
-﻿namespace Backend.Application.Features.Certifications.Dto
+﻿using Backend.Application.Features.User.Dto;
+
+namespace Backend.Application.Features.Certifications.Dto
 {
     public class CertificationDto : BaseCertificationDto
     {
-        // Extend with navigation properties if needed (e.g., User details)
+        public UserDataDto? User { get; set; }
     }
 
     public class BaseCertificationDto

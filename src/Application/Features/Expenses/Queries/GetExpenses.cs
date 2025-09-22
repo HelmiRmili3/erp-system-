@@ -2,11 +2,11 @@
 using Backend.Application.Common.Interfaces;
 using Backend.Application.Common.Response;
 using Backend.Application.Features.Expenses.Dtos;
-
-using Backend.Application.Features.Certifications.Queries;
 using Backend.Application.Common.Parameters;
-using Backend.Application.Features.Certifications.Dto;
 using Backend.Application.Common.Extensions;
+using Backend.Application.Features.User.IRepositories;
+using Backend.Application.Features.User.Dto;
+using Backend.Application.Features.Certifications.Queries;
 
 namespace Backend.Application.Features.Expenses.Queries
 {
@@ -21,14 +21,14 @@ namespace Backend.Application.Features.Expenses.Queries
     public class GetAllExpensesQueryHandler : IRequestHandler<GetAllExpensesQuery, PagedResponse<List<ExpenseDto>>>
     {
         private readonly IQueryRepository<Expense> _queryRepository;
-        private readonly ICommandRepository<Expense> _commandRepository; // Included but not used here
+        private readonly IUserQueryRepository _userRepository;
 
         public GetAllExpensesQueryHandler(
             IQueryRepository<Expense> queryRepository,
-            ICommandRepository<Expense> commandRepository)
+            IUserQueryRepository userRepository)
         {
             _queryRepository = queryRepository;
-            _commandRepository = commandRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<PagedResponse<List<ExpenseDto>>> Handle(GetAllExpensesQuery request, CancellationToken cancellationToken)
@@ -48,14 +48,40 @@ namespace Backend.Application.Features.Expenses.Queries
                 filter = filter.AndAlso(e => e.ExpenseDate.Day == request.Day.Value);
 
             var pagedResult = await _queryRepository.GetPagedAsync(
-                  filter: filter,
-                  pageNumber: request.PagingParameter.PageNumber,
-                  pageSize: request.PagingParameter.PageSize,
-                  includeTable: null,
-                  cancellationToken: cancellationToken
-              );
+                filter: filter,
+                pageNumber: request.PagingParameter.PageNumber,
+                pageSize: request.PagingParameter.PageSize,
+                includeTable: null,
+                cancellationToken: cancellationToken
+            );
 
-            var dtoList = pagedResult.Data?.Select(a => a.ToDto<ExpenseDto>()).ToList() ?? new List<ExpenseDto>();
+            var dtoList = new List<ExpenseDto>();
+
+            if (pagedResult.Data != null)
+            {
+                foreach (var expense in pagedResult.Data)
+                {
+                    UserDataDto? userDto = null;
+
+                    if (!string.IsNullOrWhiteSpace(expense.UserId))
+                    {
+                        userDto = await _userRepository.GetByIdAsync(expense.UserId, cancellationToken);
+                    }
+
+                    dtoList.Add(new ExpenseDto
+                    {
+                        Id = expense.Id,
+                        UserId = expense.UserId,
+                        Description = expense.Description,
+                        Amount = expense.Amount,
+                        ExpenseDate = expense.ExpenseDate,
+                        Category = expense.Category,
+                        Status = expense.Status,
+                        ReceiptPath = expense.ReceiptPath!,
+                        User = userDto
+                    });
+                }
+            }
 
             return new PagedResponse<List<ExpenseDto>>(
                 data: dtoList,
