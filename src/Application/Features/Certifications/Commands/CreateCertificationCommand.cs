@@ -61,27 +61,20 @@ public class CreateCertificationCommandHandler : IRequestHandler<CreateCertifica
     }
 }
 
-public class CreateCertificationCommandValidator : AbstractValidator<CreateCertificationCommand>
+public class CreateCertificationCommandValidator : AbstractValidator<CreateCertificationDto>
 {
     public CreateCertificationCommandValidator()
     {
-        RuleFor(x => x.Certification.Name)
+        RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")
             .MaximumLength(200).WithMessage("Name must not exceed 200 characters.");
 
-        RuleFor(x => x.Certification.Authority)
+        RuleFor(x => x.Authority)
             .NotEmpty().WithMessage("Authority is required.")
             .MaximumLength(200).WithMessage("Authority must not exceed 200 characters.");
 
-        RuleFor(x => x.Certification.DateObtained)
+        RuleFor(x => x.DateObtained)
             .NotEmpty().WithMessage("Date obtained is required.")
             .LessThanOrEqualTo(DateTime.Today).WithMessage("Date obtained cannot be in the future.");
-
-        When(x => x.File != null, () =>
-        {
-            RuleFor(x => x.File!.Length)
-                .LessThanOrEqualTo(5 * 1024 * 1024)
-                .WithMessage("File must be less than or equal to 5MB.");
-        });
     }
 }

@@ -164,8 +164,8 @@ app.Map("/error", (HttpContext context) =>
         statusCode: StatusCodes.Status500InternalServerError);
 });
 
-app.Map("/", () => Results.Redirect("/api"));
-//app.MapEndpoints();
+//app.Map("/", () => Results.Redirect("/api"));
+app.MapEndpoints();
 
 app.Run();
 

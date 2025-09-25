@@ -1,6 +1,8 @@
-﻿using Backend.Application.Common.Extensions;
+﻿using System.Security.Claims;
+using Backend.Application.Common.Extensions;
 using Backend.Application.Common.Response;
 using Backend.Application.Features.Attendances.Dto;
+using Microsoft.AspNetCore.Http;
 
 public record MarkAttendanceCommand : AttendanceAddDto, IRequest<Response<AttendanceDto>>;
 
@@ -8,22 +10,34 @@ public class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceComman
 {
     private readonly IAttendanceCommandRepository _commandRepository;
     private readonly IAttendanceQueryRepository _queryRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public MarkAttendanceCommandHandler(
         IAttendanceCommandRepository commandRepository,
-        IAttendanceQueryRepository queryRepository)
+        IAttendanceQueryRepository queryRepository,
+        IHttpContextAccessor httpContextAccessor
+)
+
+
     {
         _commandRepository = commandRepository;
         _queryRepository = queryRepository;
+        _httpContextAccessor = httpContextAccessor;
+
     }
 
     public async Task<Response<AttendanceDto>> Handle(MarkAttendanceCommand request, CancellationToken cancellationToken)
     {
+        var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return new Response<AttendanceDto>("Attendance could not be created").WithError("User is not authenticated.");
+        }
         Guard.Against.NullOrEmpty(request.UserId, nameof(request.UserId));
-        var attendanceDay = DateOnly.FromDateTime(DateTime.Now);
+
 
         var existingAttendance = await _queryRepository.GetSingleByFilterAsync(
-            a => a.UserId == request.UserId && a.AttendanceDay == attendanceDay,
+            a => a.UserId == request.UserId && a.AttendanceDay == request.AttendanceDay,
             null,
             cancellationToken
         );
@@ -33,9 +47,9 @@ public class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceComman
             // First time → Check-In
             var newAttendance = new Attendance
             {
-                UserId = request.UserId,
-                AttendanceDay = attendanceDay,
-                CheckIn = TimeOnly.FromDateTime(DateTime.Now),
+                UserId = userId,
+                AttendanceDay = request.AttendanceDay,
+                CheckIn = request.CheckIn,
                 CheckInMethod = request.CheckInMethod,
                 CheckInLatitude = request.CheckInLatitude,
                 CheckInLongitude = request.CheckInLongitude,
@@ -54,7 +68,7 @@ public class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceComman
 
         if (existingAttendance.CheckIn == null)
         {
-            existingAttendance.CheckIn = TimeOnly.FromDateTime(DateTime.Now);
+            existingAttendance.CheckIn = request.CheckIn;
             existingAttendance.CheckInMethod = request.CheckInMethod;
             existingAttendance.CheckInLatitude = request.CheckInLatitude;
             existingAttendance.CheckInLongitude = request.CheckInLongitude;
@@ -69,7 +83,7 @@ public class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceComman
 
         if (existingAttendance.CheckOut == null)
         {
-            existingAttendance.CheckOut = TimeOnly.FromDateTime(DateTime.Now);
+            existingAttendance.CheckOut = request.CheckOut;
             existingAttendance.CheckOutMethod = request.CheckOutMethod;
             existingAttendance.CheckOutLatitude = request.CheckOutLatitude;
             existingAttendance.CheckOutLongitude = request.CheckOutLongitude;
@@ -84,4 +98,5 @@ public class MarkAttendanceCommandHandler : IRequestHandler<MarkAttendanceComman
 
         return new Response<AttendanceDto>(existingAttendance.ToDto<AttendanceDto>(), "User already checked out today.");
     }
+
 }
